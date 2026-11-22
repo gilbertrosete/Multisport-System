@@ -1,0 +1,5407 @@
+/* =========================================================
+   MULTISPORT — INNER PAGES
+   facilities · booking · guest-booking · login · register
+
+   Standalone stylesheet (does NOT use style.css).
+   Same design language as home.css: court lines, condensed
+   display type, turf green, gold only where the player acts.
+========================================================= */
+
+
+/* =========================================================
+   01. TOKENS
+========================================================= */
+
+:root {
+    --pitch: #0f6b3b;
+    --turf: #0d2b1e;
+    --turf-deep: #0a2016;
+    --gold: #fbbf24;
+    --gold-soft: #fcd34d;
+    --surface: #f4f2ec;
+    --white: #ffffff;
+    --rule: #d9d5c7;
+    --text: #10271c;
+    --muted: #5a6359;
+    --warn: #c2410c;
+    --bad: #b42318;
+
+    --font-display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --container: 1200px;
+    --nav-h: 84px;
+    --radius: 3px;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* painted court lines (decoration only) */
+    --court-half: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600' fill='none' stroke='white' stroke-width='4'%3E%3Crect x='20' y='20' width='760' height='560'/%3E%3Crect x='290' y='20' width='220' height='250'/%3E%3Ccircle cx='400' cy='270' r='80'/%3E%3Cpath d='M120 20V130A290 290 0 0 0 680 130V20'/%3E%3Cpath d='M360 50H440'/%3E%3Ccircle cx='400' cy='72' r='16'/%3E%3Cpath d='M300 600A100 100 0 0 1 500 600'/%3E%3C/svg%3E");
+    --court-full: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600' fill='none' stroke='white' stroke-width='4'%3E%3Crect x='20' y='20' width='760' height='560'/%3E%3Cpath d='M400 20V580'/%3E%3Ccircle cx='400' cy='300' r='110'/%3E%3Crect x='20' y='170' width='170' height='260'/%3E%3Crect x='610' y='170' width='170' height='260'/%3E%3C/svg%3E");
+}
+
+
+/* =========================================================
+   02. RESET + BASE
+========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--surface);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+}
+
+.container {
+    width: min(100% - 48px, var(--container));
+    margin-inline: auto;
+}
+
+
+/* =========================================================
+   03. BUTTONS
+========================================================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 0 22px;
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-large {
+    min-height: 56px;
+    padding: 0 30px;
+    font-size: 16px;
+}
+
+.btn-dark,
+.btn-primary,
+.btn-blue {
+    background: var(--turf);
+    color: var(--white);
+}
+
+.btn-dark:hover,
+.btn-primary:hover,
+.btn-blue:hover {
+    background: var(--pitch);
+}
+
+.btn-outline {
+    background: transparent;
+    border-color: var(--turf);
+    color: var(--turf);
+}
+
+.btn-outline:hover {
+    background: var(--turf);
+    color: var(--white);
+}
+
+
+/* =========================================================
+   04. HEADER  (sticky, solid green)
+========================================================= */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--pitch);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.14);
+    transition: box-shadow 0.3s ease;
+}
+
+.site-header.scrolled {
+    box-shadow: 0 6px 24px rgba(6, 38, 25, 0.3);
+}
+
+.nav-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    min-height: var(--nav-h);
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+}
+
+.brand-logo-img {
+    height: 52px;
+    width: auto;
+    object-fit: contain;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-inline: auto;
+}
+
+.nav-link {
+    position: relative;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color 0.2s ease;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 3px;
+    height: 3px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s var(--ease);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--white);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    transform: scaleX(1);
+}
+
+.nav-actions {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-actions .btn {
+    min-height: 44px;
+    padding: 0 20px;
+    font-size: 14px;
+}
+
+.site-header .btn-outline {
+    border-color: rgba(255, 255, 255, 0.6);
+    color: var(--white);
+}
+
+.site-header .btn-outline:hover {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--turf);
+}
+
+.site-header .btn-dark,
+.site-header .btn-primary {
+    background: var(--gold);
+    color: var(--turf);
+}
+
+.site-header .btn-dark:hover,
+.site-header .btn-primary:hover {
+    background: var(--gold-soft);
+}
+
+.mobile-menu-btn {
+    display: none;
+}
+
+
+/* =========================================================
+   05. PAGE HERO  (facilities, booking, guest booking)
+========================================================= */
+
+.page-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 76px 0 84px;
+    background: var(--turf);
+    color: var(--white);
+}
+
+.page-hero::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -6%;
+    top: -34%;
+    width: min(760px, 70vw);
+    aspect-ratio: 4 / 3;
+    opacity: 0.08;
+    transform: rotate(-7deg);
+    background: var(--court-half) center / contain no-repeat;
+}
+
+.page-hero h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(52px, 7.4vw, 100px);
+    line-height: 0.88;
+    text-transform: uppercase;
+}
+
+.page-hero h1 span {
+    display: block;
+}
+
+/* one painted line under the headline */
+.page-hero h1::after {
+    content: "";
+    display: block;
+    width: 96px;
+    height: 8px;
+    margin-top: 26px;
+    background: var(--gold);
+}
+
+.page-hero p {
+    max-width: 520px;
+    margin-top: 26px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+
+/* =========================================================
+   06. FORM FIELDS  (underline style, shared)
+========================================================= */
+
+.booking-field,
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.booking-field label,
+.form-group label,
+.schedule-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.booking-field input,
+.booking-field select,
+.form-group input:not([type="checkbox"]) {
+    width: 100%;
+    height: 52px;
+    padding: 0 28px 0 0;
+    background-color: transparent;
+    border: 0;
+    border-bottom: 3px solid var(--rule);
+    border-radius: 0;
+    outline: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s ease;
+}
+
+.booking-field input::placeholder,
+.form-group input::placeholder {
+    font-weight: 500;
+    color: #8da398;
+}
+
+.booking-field input:hover,
+.booking-field select:hover,
+.form-group input:hover {
+    border-bottom-color: #9db3a3;
+}
+
+.booking-field input:focus,
+.booking-field select:focus,
+.form-group input:focus {
+    border-bottom-color: var(--pitch);
+}
+
+.booking-field input:-webkit-autofill,
+.form-group input:-webkit-autofill {
+    -webkit-text-fill-color: var(--text);
+    -webkit-box-shadow: 0 0 0 1000px var(--white) inset;
+}
+
+.booking-field select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f6b3b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    background-size: 16px;
+}
+
+.booking-field input[type="date"] {
+    position: relative;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f6b3b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='17' rx='1'/%3E%3Cpath d='M3 9h18M8 2v4M16 2v4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    background-size: 18px;
+}
+
+/* the whole date box opens the calendar picker */
+.booking-field input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.booking-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+}
+
+.form-two-column {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+
+/* =========================================================
+   07. FACILITIES PAGE
+========================================================= */
+
+.facility-browser {
+    padding: 72px 0 110px;
+}
+
+.facility-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.facility-item {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    overflow: hidden;
+    background: var(--white);
+    border: 2px solid var(--turf);
+    border-radius: var(--radius);
+    transition: border-color 0.25s ease, transform 0.35s var(--ease);
+}
+
+.facility-item:hover {
+    border-color: var(--pitch);
+    transform: translateY(-4px);
+}
+
+.facility-image {
+    position: relative;
+    min-height: 340px;
+    overflow: hidden;
+    cursor: zoom-in;
+    background: var(--turf);
+}
+
+.facility-image img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease);
+}
+
+.facility-item:hover .facility-image img {
+    transform: scale(1.06);
+}
+
+.facility-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(180deg, rgba(6, 38, 25, 0.35) 0%, rgba(6, 38, 25, 0) 40%, rgba(6, 38, 25, 0.55) 100%);
+    pointer-events: none;
+}
+
+/* small line drawing of each court */
+.facility-image::before {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    left: 14px;
+    top: 14px;
+    width: 78px;
+    height: 56px;
+    border-radius: 2px;
+    background-color: rgba(6, 38, 25, 0.82);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 58px 40px;
+    pointer-events: none;
+}
+
+.facility-item:nth-child(1) .facility-image::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M32 2V42'/%3E%3Ccircle cx='32' cy='22' r='6'/%3E%3Crect x='2' y='14' width='12' height='16'/%3E%3Crect x='50' y='14' width='12' height='16'/%3E%3C/svg%3E");
+}
+
+.facility-item:nth-child(2) .facility-image::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M32 0V44' stroke-width='3.5'/%3E%3Cpath d='M22 2V42M42 2V42'/%3E%3C/svg%3E");
+}
+
+.facility-item:nth-child(3) .facility-image::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M2 8H62M2 36H62M32 2V42M17 8V36M47 8V36M17 22H47'/%3E%3C/svg%3E");
+}
+
+.facility-item:nth-child(4) .facility-image::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M2 7H62M2 37H62M32 2V42M25 2V42M39 2V42M6 2V42M58 2V42M2 22H25M39 22H62'/%3E%3C/svg%3E");
+}
+
+/* status badge — script.js may add status-maintenance / status-occupied */
+.facility-status {
+    position: absolute;
+    z-index: 4;
+    left: 14px;
+    bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    background: rgba(6, 38, 25, 0.82);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+}
+
+.facility-status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+}
+
+.facility-status.status-maintenance::before {
+    background: #f87171;
+}
+
+.facility-status.status-occupied::before {
+    background: #fb923c;
+}
+
+.facility-content {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 28px 26px;
+}
+
+.facility-category {
+    align-self: flex-start;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pitch);
+}
+
+.facility-content h3 {
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.facility-content p {
+    margin-top: 14px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--muted);
+}
+
+.facility-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.facility-info-row span {
+    padding: 4px 11px;
+    border: 2px solid var(--rule);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.facility-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+.facility-bottom::before {
+    content: none;
+}
+
+.facility-price {
+    display: block;
+}
+
+.price-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.facility-price strong {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--turf);
+}
+
+.price-unit {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.facility-bottom a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 26px;
+    border-radius: var(--radius);
+    background: var(--turf);
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 700;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.facility-bottom a:hover {
+    background: var(--gold);
+    color: var(--turf);
+}
+
+
+/* =========================================================
+   08. BOOKING + GUEST BOOKING
+   (.guest-page-section = same layout as .booking-page-section;
+    kept separate because script.js runs the facility-picker
+    logic on every .booking-page-section)
+========================================================= */
+
+.booking-page-section,
+.guest-page-section {
+    padding: 64px 0 110px;
+}
+
+.booking-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 390px;
+    gap: 32px;
+    align-items: start;
+}
+
+.booking-form-card {
+    padding: 44px 44px 40px;
+    background: var(--white);
+    border: 2px solid var(--turf);
+    border-radius: var(--radius);
+}
+
+.form-heading h2 {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 0.92;
+    text-transform: uppercase;
+}
+
+.form-heading p {
+    max-width: 480px;
+    margin-top: 12px;
+    color: var(--muted);
+}
+
+.form-section {
+    margin-top: 36px;
+    padding-top: 34px;
+    border-top: 2px solid var(--rule);
+}
+
+.form-section-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+.form-step-number {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 0.82;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--pitch);
+}
+
+.form-section-title h3 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.form-section-title p {
+    margin-top: 6px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+
+/* ---------- selectable tiles (facility / method) ---------- */
+
+.facility-select-grid,
+.booking-method-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.facility-choice,
+.booking-method {
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.facility-choice input,
+.booking-method input,
+.time-slot input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.facility-choice-content,
+.booking-method-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 100%;
+    padding: 16px 18px;
+    background: var(--white);
+    border: 2px solid var(--rule);
+    border-radius: var(--radius);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.facility-choice:hover .facility-choice-content,
+.booking-method:hover .booking-method-content {
+    border-color: var(--pitch);
+}
+
+.choice-icon,
+.method-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    background: var(--surface);
+    border-radius: 2px;
+    font-size: 26px;
+    color: var(--pitch);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.facility-choice-content strong,
+.booking-method-content strong {
+    display: block;
+    font-size: 17px;
+    line-height: 1.25;
+}
+
+.facility-choice-content span,
+.booking-method-content span {
+    display: block;
+    margin-top: 2px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--muted);
+}
+
+.choice-check,
+.method-check {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin-left: auto;
+    border: 2px solid var(--rule);
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 800;
+    color: transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.facility-choice input:checked + .facility-choice-content,
+.booking-method input:checked + .booking-method-content {
+    background: var(--turf);
+    border-color: var(--turf);
+    color: var(--white);
+}
+
+.facility-choice input:checked + .facility-choice-content span,
+.booking-method input:checked + .booking-method-content span {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.facility-choice input:checked + .facility-choice-content .choice-icon,
+.booking-method input:checked + .booking-method-content .method-icon {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--gold);
+}
+
+.facility-choice input:checked + .facility-choice-content .choice-check,
+.booking-method input:checked + .booking-method-content .method-check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--turf);
+}
+
+.facility-choice input:focus-visible + .facility-choice-content,
+.booking-method input:focus-visible + .booking-method-content,
+.time-slot input:focus-visible + span {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+}
+
+
+/* ---------- time slots ---------- */
+
+.schedule-label {
+    display: block;
+    margin: 30px 0 12px;
+}
+
+.time-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.time-slot {
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.time-slot span {
+    display: grid;
+    place-items: center;
+    min-height: 54px;
+    padding: 0 6px;
+    background: var(--white);
+    border: 2px solid var(--rule);
+    border-radius: var(--radius);
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.time-slot:hover span {
+    border-color: var(--pitch);
+}
+
+.time-slot input:checked + span {
+    background: var(--gold);
+    border-color: var(--turf);
+    color: var(--turf);
+}
+
+
+/* disabled by script.js: court under maintenance / slot already booked */
+
+.time-slot:has(input:disabled),
+.facility-choice:has(input:disabled),
+.booking-method:has(input:disabled) {
+    cursor: not-allowed;
+}
+
+.time-slot input:disabled + span {
+    background: var(--surface);
+    border-style: dashed;
+    color: #7c9486;
+    text-decoration: line-through;
+}
+
+.time-slot:has(input:disabled):hover span {
+    border-color: var(--rule);
+}
+
+.facility-choice input:disabled + .facility-choice-content,
+.booking-method input:disabled + .booking-method-content {
+    background: var(--surface);
+    border-style: dashed;
+}
+
+.facility-choice:has(input:disabled):hover .facility-choice-content,
+.booking-method:has(input:disabled):hover .booking-method-content {
+    border-color: var(--rule);
+}
+
+
+/* ---------- guest-only blocks ---------- */
+
+.schedule-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: 34px;
+    padding: 16px 18px;
+    border: 2px dashed var(--rule);
+    border-radius: var(--radius);
+}
+
+.schedule-note-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--turf);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.schedule-note p {
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.guest-agreement {
+    margin-top: 24px;
+}
+
+.agreement-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.agreement-check input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+    accent-color: var(--pitch);
+}
+
+.guest-page-section .booking-field select {
+    margin-top: 0;
+}
+
+
+/* ---------- actions ---------- */
+
+.booking-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 38px;
+    padding-top: 28px;
+    border-top: 2px solid var(--rule);
+}
+
+.booking-form-actions .btn-dark,
+.auth-submit {
+    background: var(--gold);
+    color: var(--turf);
+}
+
+.booking-form-actions .btn-dark:hover,
+.auth-submit:hover {
+    background: var(--turf);
+    color: var(--white);
+}
+
+
+/* ---------- summary ticket ---------- */
+
+.booking-summary-card {
+    position: sticky;
+    top: calc(var(--nav-h) + 20px);
+    padding: 34px 30px 30px;
+    background: var(--turf);
+    border-radius: var(--radius);
+    color: var(--white);
+}
+
+.summary-top h2 {
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 0.92;
+    text-transform: uppercase;
+}
+
+.summary-top p {
+    margin-top: 10px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.summary-preview {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 26px;
+    padding: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.22);
+    border-radius: var(--radius);
+}
+
+.summary-preview-image {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+.summary-sport-icon {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.summary-preview-content {
+    min-width: 0;
+}
+
+.summary-preview-content span {
+    display: block;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.summary-preview-content .summary-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+}
+
+.summary-preview-content strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.summary-details {
+    margin-top: 10px;
+}
+
+.summary-detail {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px 0;
+    border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.summary-detail span {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.summary-detail strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.summary-total {
+    border-bottom: 0;
+    padding-top: 18px;
+}
+
+.summary-total span {
+    font-weight: 600;
+    color: var(--white);
+}
+
+.summary-total strong {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--gold);
+}
+
+
+.summary-divider {
+    margin: 22px 0;
+    border-top: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.summary-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.notice-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--gold);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--turf);
+}
+
+.summary-notice strong {
+    display: block;
+    font-size: 15px;
+}
+
+.summary-notice p {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.summary-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 2px solid rgba(255, 255, 255, 0.18);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.summary-footer a {
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.summary-footer a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   09. AUTH  (login + register)
+   one rectangle split like a ticket: turf stub + white form
+========================================================= */
+
+.auth-page {
+    padding: 64px 0 24px;
+}
+
+.auth-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    overflow: hidden;
+    background: var(--white);
+    border: 2px solid var(--turf);
+    border-radius: var(--radius);
+}
+
+.auth-intro {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    padding: 56px 48px 44px;
+    overflow: hidden;
+    background: var(--turf);
+    color: var(--white);
+}
+
+.auth-intro::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -18%;
+    bottom: -14%;
+    width: 560px;
+    aspect-ratio: 4 / 3;
+    opacity: 0.07;
+    transform: rotate(8deg);
+    background: var(--court-full) center / contain no-repeat;
+}
+
+.auth-intro h1 {
+    font-family: var(--font-display);
+    font-size: clamp(54px, 6vw, 84px);
+    font-weight: 800;
+    line-height: 0.88;
+    text-transform: uppercase;
+}
+
+.auth-intro h1 span {
+    display: block;
+}
+
+.auth-intro h1::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 8px;
+    margin-top: 24px;
+    background: var(--gold);
+}
+
+.auth-intro > p {
+    max-width: 420px;
+    margin-top: 24px;
+    font-size: 17px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-top: 38px;
+}
+
+.auth-benefit {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.auth-benefit-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 6px;
+    background: var(--gold);
+    border-radius: 2px;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--turf);
+}
+
+.auth-benefit strong {
+    display: block;
+    font-size: 17px;
+    line-height: 1.3;
+}
+
+.auth-benefit p {
+    margin-top: 2px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 14px;
+    margin-top: auto;
+    padding-top: 22px;
+    border-top: 2px dashed rgba(255, 255, 255, 0.28);
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.auth-intro .auth-benefits + .auth-note {
+    margin-top: 44px;
+}
+
+.auth-note a {
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.auth-note a:hover {
+    text-decoration: underline;
+}
+
+.auth-card {
+    padding: 56px 56px 44px;
+}
+
+.auth-card-header h2 {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 0.92;
+    text-transform: uppercase;
+}
+
+.auth-card-header p {
+    margin-top: 12px;
+    color: var(--muted);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 34px;
+}
+
+.form-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.form-help-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pitch);
+}
+
+.form-help-link:hover {
+    text-decoration: underline;
+}
+
+.form-checkbox label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1.55;
+}
+
+.form-checkbox input {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+    accent-color: var(--pitch);
+}
+
+.auth-submit {
+    width: 100%;
+    margin-top: 6px;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 30px 0 24px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    border-top: 2px solid var(--rule);
+}
+
+.guest-login-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+    border: 2px dashed var(--rule);
+    border-radius: var(--radius);
+}
+
+.auth-form + .auth-register {
+    margin-top: 24px;
+}
+
+.guest-login-option strong {
+    display: block;
+    font-size: 16px;
+}
+
+.guest-login-option p {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.text-link {
+    flex: none;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--pitch);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+.text-link:hover {
+    color: var(--turf);
+}
+
+.auth-register {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 10px;
+    margin-top: 22px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.auth-register a {
+    font-weight: 700;
+    color: var(--pitch);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+.guest-login-option + .auth-register,
+.auth-register + .guest-login-option {
+    margin-top: 22px;
+}
+
+
+/* ---------- info strip (login, register, guest) ---------- */
+
+.auth-information {
+    padding: 72px 0 110px;
+}
+
+.auth-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.auth-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 0 34px;
+    border-left: 2px solid var(--rule);
+}
+
+.auth-info-item:first-child {
+    padding-left: 0;
+    border-left: 0;
+}
+
+.auth-info-number {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--pitch);
+}
+
+.auth-info-item h3 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.auth-info-item p {
+    margin-top: 8px;
+    font-size: 16px;
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   10. FOOTER
+========================================================= */
+
+.footer {
+    padding-top: 80px;
+    background: var(--pitch);
+    color: var(--white);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 64px;
+}
+
+.footer .brand-logo-img {
+    height: 58px;
+}
+
+.footer-brand p {
+    max-width: 300px;
+    margin-top: 18px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.footer-column h4 {
+    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.footer-column a {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: var(--gold);
+}
+
+.footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 76px;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+
+/* =========================================================
+   11. MODALS  (JS sets display:flex to open, none to close)
+========================================================= */
+
+.adv-modal-overlay,
+.qr-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(6, 38, 25, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.adv-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 820px;
+    padding: 12px 12px 18px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+}
+
+.adv-modal-content img {
+    width: 100%;
+    max-height: 68vh;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.adv-modal-content h4 {
+    margin-top: 14px;
+    padding-inline: 6px;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--turf);
+}
+
+.adv-modal-close {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--turf);
+    font-size: 16px;
+    font-weight: 800;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* QR payment */
+
+.qr-card {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+}
+
+.qr-head {
+    padding: 26px 30px 22px;
+    background: var(--turf);
+    color: var(--white);
+}
+
+.qr-head h3 {
+    font-family: var(--font-display);
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.qr-head p {
+    margin-top: 8px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.qr-body {
+    padding: 26px 30px 30px;
+    text-align: center;
+}
+
+.qr-code-box {
+    display: inline-block;
+    padding: 12px;
+    border: 2px solid var(--turf);
+    border-radius: var(--radius);
+}
+
+.qr-code-box img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+}
+
+.qr-total {
+    margin-top: 18px;
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--turf);
+}
+
+.qr-field {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.qr-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.qr-field input {
+    width: 100%;
+    height: 50px;
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid var(--rule);
+    border-radius: 0;
+    outline: none;
+    font-size: 17px;
+    font-weight: 600;
+    transition: border-color 0.2s ease;
+}
+
+.qr-field input:focus {
+    border-bottom-color: var(--pitch);
+}
+
+.qr-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 26px;
+}
+
+.qr-actions .btn {
+    flex: 1;
+}
+
+.qr-actions .btn-dark {
+    background: var(--gold);
+    color: var(--turf);
+}
+
+.qr-actions .btn-dark:hover {
+    background: var(--turf);
+    color: var(--white);
+}
+
+
+/* =========================================================
+   11b. TRACK BOOKING
+   search card (white) + reservation ticket (turf)
+========================================================= */
+
+.track-booking-section {
+    padding: 64px 0 24px;
+}
+
+.track-booking-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.track-search-card {
+    padding: 44px 40px 34px;
+    background: var(--white);
+    border: 2px solid var(--turf);
+    border-radius: var(--radius);
+}
+
+.track-search-heading h2 {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: var(--turf);
+}
+
+.track-search-heading p {
+    margin-top: 14px;
+    font-size: 16px;
+    color: var(--muted);
+}
+
+.tracking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 34px;
+}
+
+.field-help {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.tracking-submit {
+    width: 100%;
+    background: var(--gold);
+    color: var(--turf);
+}
+
+.tracking-submit:hover {
+    background: var(--turf);
+    color: var(--white);
+}
+
+.tracking-help-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: 34px;
+    padding-top: 26px;
+    border-top: 2px dashed var(--rule);
+}
+
+.tracking-help-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--turf);
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--turf);
+}
+
+.tracking-help-box strong {
+    display: block;
+    font-size: 16px;
+}
+
+.tracking-help-box p {
+    margin-top: 4px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.track-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 24px;
+}
+
+
+/* ---------- reservation ticket ---------- */
+
+.tracking-preview-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--turf);
+    border-radius: var(--radius);
+    color: var(--white);
+}
+
+.tracking-preview-card::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -14%;
+    bottom: -8%;
+    width: 520px;
+    aspect-ratio: 4 / 3;
+    opacity: 0.05;
+    transform: rotate(-8deg);
+    background: var(--court-full) center / contain no-repeat;
+    pointer-events: none;
+}
+
+.tracking-ticket-head {
+    padding: 34px 34px 30px;
+}
+
+.tracking-preview-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+}
+
+.tracking-ticket-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.tracking-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+}
+
+/* script.js writes a slate colour inline on the status word */
+.tracking-status-badge strong {
+    color: var(--white) !important;
+    font-weight: 800;
+}
+
+.status-dot {
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--gold);
+}
+
+.tracking-reference-label {
+    margin-top: 28px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tracking-reference {
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-size: clamp(42px, 5vw, 64px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    overflow-wrap: anywhere;
+}
+
+/* perforation between the head and the rest of the ticket */
+.tracking-progress {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 38px 34px 30px;
+    border-top: 2px dashed rgba(255, 255, 255, 0.28);
+}
+
+.tracking-progress::before,
+.tracking-progress::after {
+    content: "";
+    position: absolute;
+    top: -15px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface);
+}
+
+.tracking-progress::before {
+    left: -14px;
+}
+
+.tracking-progress::after {
+    right: -14px;
+}
+
+.progress-line {
+    position: absolute;
+    top: 56px;
+    left: calc(34px + (100% - 68px) / 8);
+    right: calc(34px + (100% - 68px) / 8);
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.progress-step {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.progress-step span {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    background: var(--turf);
+    font-size: 15px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.progress-step small {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.progress-step.active span {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--turf);
+}
+
+.progress-step.active small {
+    color: var(--white);
+}
+
+.tracking-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 28px;
+    padding: 0 34px;
+}
+
+.tracking-detail {
+    min-width: 0;
+    padding: 16px 0;
+    border-top: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.tracking-detail span {
+    display: block;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.68);
+}
+
+.tracking-detail strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.tracking-status-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin: 0 34px;
+    padding: 22px 0 34px;
+    border-top: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.tracking-status-message strong {
+    display: block;
+    font-size: 16px;
+}
+
+.tracking-status-message p {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* the print button is created by script.js with inline styles */
+#printReceiptBtn {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px 24px !important;
+    border-radius: 0 !important;
+    background: var(--gold) !important;
+    color: var(--turf) !important;
+    font-family: var(--font-body) !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+}
+
+#printReceiptBtn:hover {
+    background: var(--gold-soft) !important;
+}
+
+.tracking-status-message:last-child {
+    padding-bottom: 34px;
+}
+
+.track-information {
+    padding-top: 80px;
+}
+
+.track-info-title {
+    margin-bottom: 36px;
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--turf);
+}
+
+
+/* =========================================================
+   11c. PROFILE
+   stat tiles · member card · reservation table · court board
+========================================================= */
+
+.profile-hero {
+    padding: 60px 0 66px;
+}
+
+.profile-hero h1 {
+    font-size: clamp(40px, 5.6vw, 78px);
+}
+
+.profile-hero h1 span {
+    overflow-wrap: anywhere;
+}
+
+.profile-section {
+    padding: 48px 0 110px;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.profile-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 24px 28px 24px;
+    background: var(--white);
+    border: 2px solid var(--turf);
+    border-top: 8px solid var(--pitch);
+    border-radius: var(--radius);
+}
+
+.profile-stat-pending {
+    border-top-color: var(--gold);
+}
+
+.profile-stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.profile-stat-value {
+    font-family: var(--font-display);
+    font-size: 76px;
+    font-weight: 800;
+    line-height: 0.95;
+    color: var(--turf);
+    overflow-wrap: anywhere;
+}
+
+.profile-stat-money {
+    font-size: 58px;
+    line-height: 1.2;
+}
+
+.profile-stat-sub {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+
+.profile-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr);
+    gap: 24px;
+    align-items: start;
+}
+
+/* member card */
+
+.member-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 34px 30px 30px;
+    background: var(--turf);
+    border-radius: var(--radius);
+    color: var(--white);
+}
+
+.member-card::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -30%;
+    bottom: -6%;
+    width: 440px;
+    aspect-ratio: 4 / 3;
+    opacity: 0.06;
+    transform: rotate(-10deg);
+    background: var(--court-full) center / contain no-repeat;
+    pointer-events: none;
+}
+
+.member-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 24px;
+    border-bottom: 2px dashed rgba(255, 255, 255, 0.22);
+}
+
+.member-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius);
+    background: var(--gold);
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--turf);
+}
+
+.member-top > div:last-child {
+    min-width: 0;
+}
+
+.member-top h2 {
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 0.95;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+}
+
+.member-top p {
+    margin-top: 6px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.member-details > div {
+    padding: 16px 0;
+    border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+}
+
+.member-details dt {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+}
+
+.member-details dd {
+    margin-top: 2px;
+    font-size: 16px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.member-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.member-actions .btn {
+    width: 100%;
+}
+
+.member-edit {
+    border-color: rgba(255, 255, 255, 0.55);
+    color: var(--white);
+}
+
+.member-edit:hover {
+    background: var(--white);
+    border-color: var(--white);
+    color: var(--turf);
+}
+
+.member-book {
+    background: var(--gold);
+    color: var(--turf);
+}
+
+.member-book:hover {
+    background: var(--gold-soft);
+}
+
+/* reservation history */
+
+.history-card,
+.status-board {
+    padding: 32px 32px 28px;
+    background: var(--white);
+    border: 2px solid var(--turf);
+    border-radius: var(--radius);
+}
+
+.history-head h2 {
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: var(--turf);
+}
+
+.history-head p {
+    margin-top: 8px;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+.history-scroll {
+    margin-top: 22px;
+    overflow-x: auto;
+}
+
+.res-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.res-table th {
+    padding: 10px 12px;
+    border-bottom: 3px solid var(--turf);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.res-table td {
+    padding: 16px 12px;
+    border-bottom: 2px solid var(--rule);
+    font-size: 15px;
+    vertical-align: top;
+}
+
+.res-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.res-ref {
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--turf);
+}
+
+.res-table td > div {
+    white-space: nowrap;
+}
+
+.res-time {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.res-remarks {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.res-table .res-empty {
+    padding: 40px 12px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.res-table .res-empty .text-link {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.res-table .res-error {
+    color: var(--bad);
+}
+
+.res-table code {
+    padding: 2px 6px;
+    background: var(--surface);
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pill-pending  { background: #fef3c7; color: #92400e; }
+.pill-approved { background: #dcfce7; color: #166534; }
+.pill-rejected { background: #fee2e2; color: #991b1b; }
+.pill-refunded { background: #e0f2fe; color: #0369a1; }
+
+/* court availability board */
+
+.status-board {
+    margin-top: 24px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.profile-status-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 16px;
+    border: 2px solid var(--rule);
+    border-radius: var(--radius);
+    transition: border-color 0.2s ease;
+}
+
+.profile-status-card::before {
+    content: "";
+    width: 78px;
+    height: 56px;
+    margin-bottom: 14px;
+    border-radius: 2px;
+    background-color: var(--turf);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 58px 40px;
+}
+
+.profile-status-card[data-facility="basketball"]::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M32 2V42'/%3E%3Ccircle cx='32' cy='22' r='6'/%3E%3Crect x='2' y='14' width='12' height='16'/%3E%3Crect x='50' y='14' width='12' height='16'/%3E%3C/svg%3E");
+}
+
+.profile-status-card[data-facility="volleyball"]::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M32 0V44' stroke-width='3.5'/%3E%3Cpath d='M22 2V42M42 2V42'/%3E%3C/svg%3E");
+}
+
+.profile-status-card[data-facility="tennis"]::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M2 8H62M2 36H62M32 2V42M17 8V36M47 8V36M17 22H47'/%3E%3C/svg%3E");
+}
+
+.profile-status-card[data-facility="badminton"]::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 44' fill='none' stroke='white' stroke-width='2'%3E%3Crect x='2' y='2' width='60' height='40'/%3E%3Cpath d='M2 7H62M2 37H62M32 2V42M25 2V42M39 2V42M6 2V42M58 2V42M2 22H25M39 22H62'/%3E%3C/svg%3E");
+}
+
+.profile-status-card strong {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--turf);
+}
+
+.status-kind {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.status-badge-el {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    margin-top: 12px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    background: var(--turf);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--white);
+}
+
+.status-badge-el::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+}
+
+/* state is set by the page script (data-state) */
+.profile-status-card[data-state="maintenance"] {
+    border-color: #e8b4ad;
+}
+
+.profile-status-card[data-state="maintenance"] .status-badge-el {
+    background: var(--bad);
+}
+
+.profile-status-card[data-state="maintenance"] .status-badge-el::before {
+    background: #fecaca;
+}
+
+.profile-status-card[data-state="occupied"] {
+    border-color: #f1c9a8;
+}
+
+.profile-status-card[data-state="occupied"] .status-badge-el {
+    background: var(--warn);
+}
+
+.profile-status-card[data-state="occupied"] .status-badge-el::before {
+    background: #fed7aa;
+}
+
+/* edit profile modal (reuses the .qr-modal shell) */
+
+.profile-modal-card {
+    position: relative;
+    max-width: 500px;
+}
+
+.profile-modal .qr-head {
+    padding-right: 70px;
+}
+
+.modal-x {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--gold);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--turf);
+}
+
+.modal-x:hover {
+    background: var(--gold-soft);
+}
+
+.profile-modal-body {
+    text-align: left;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.profile-form .form-two-column {
+    gap: 18px;
+}
+
+.profile-form .form-group input {
+    font-size: 17px;
+}
+
+.profile-form .form-group input:disabled {
+    border-bottom-style: dashed;
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.profile-form .qr-actions {
+    margin-top: 6px;
+}
+
+
+/* =========================================================
+   11d. NAV PROFILE DROPDOWN
+   script.js builds it with inline slate styles when logged in
+========================================================= */
+
+.profile-trigger-btn {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 2px solid rgba(255, 255, 255, 0.45) !important;
+    border-radius: var(--radius) !important;
+}
+
+.profile-trigger-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.profile-avatar-badge {
+    background: var(--gold) !important;
+    color: var(--turf) !important;
+    border-radius: 2px !important;
+}
+
+.profile-name {
+    color: var(--white) !important;
+}
+
+.profile-role,
+.dropdown-chevron {
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.profile-dropdown-menu {
+    border: 2px solid var(--turf) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: 0 20px 40px rgba(6, 38, 25, 0.28) !important;
+    font-family: var(--font-body) !important;
+}
+
+.profile-dropdown-menu > div:first-child {
+    background: var(--surface) !important;
+    border-bottom-color: var(--rule) !important;
+}
+
+.profile-dropdown-menu strong {
+    color: var(--turf) !important;
+}
+
+.profile-dropdown-menu a {
+    color: var(--text) !important;
+}
+
+.profile-dropdown-menu > div:last-child {
+    background: var(--surface) !important;
+    border-top-color: var(--rule) !important;
+}
+
+.profile-dropdown-menu button {
+    background: var(--turf) !important;
+    border-radius: var(--radius) !important;
+}
+
+
+/* =========================================================
+   12. SCRIPT.JS HOOKS
+========================================================= */
+
+/* script.js writes inline slate colours on the status badge.
+   Keep it on-brand; the dot colour still changes per status. */
+.facility-status {
+    background-color: rgba(6, 38, 25, 0.82) !important;
+    color: var(--white) !important;
+}
+
+
+/* =========================================================
+   13. RESPONSIVE
+========================================================= */
+
+@media (max-width: 1180px) {
+    .facility-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1000px) {
+    .booking-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-summary-card {
+        position: static;
+    }
+
+    .time-slot-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .auth-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-intro {
+        padding: 44px 36px 36px;
+    }
+
+    .auth-card {
+        padding: 44px 36px 36px;
+    }
+
+    .auth-info-grid {
+        grid-template-columns: 1fr;
+        gap: 34px;
+    }
+
+    .auth-info-item,
+    .auth-info-item:first-child {
+        padding: 0;
+        border-left: 0;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+    }
+}
+
+/* mobile navigation */
+@media (max-width: 900px) {
+    .logo { order: 1; }
+
+    .mobile-menu-btn {
+        order: 2;
+        display: grid;
+        place-items: center;
+        width: 46px;
+        height: 46px;
+        border: 2px solid rgba(255, 255, 255, 0.55);
+        border-radius: var(--radius);
+        color: var(--white);
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .nav-inner {
+        padding-block: 12px;
+        gap: 0 16px;
+    }
+
+    .main-nav,
+    .nav-actions {
+        display: none;
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .main-nav.mobile-open {
+        order: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        margin: 10px 0 0;
+        border-top: 2px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .nav-actions.mobile-open {
+        order: 4;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px 0 20px;
+    }
+
+    .nav-actions.mobile-open .btn {
+        width: 100%;
+    }
+
+    .nav-link {
+        padding: 16px 2px;
+        font-size: 17px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link::after {
+        display: none;
+    }
+
+    .nav-link.active {
+        color: var(--gold);
+    }
+
+    .site-header:has(.mobile-open) {
+        background: var(--turf);
+    }
+}
+
+@media (max-width: 760px) {
+    :root {
+        --nav-h: 72px;
+    }
+
+    .container {
+        width: min(100% - 36px, var(--container));
+    }
+
+    .brand-logo-img {
+        height: 46px;
+    }
+
+    .page-hero {
+        padding: 52px 0 58px;
+    }
+
+    .page-hero p {
+        font-size: 16px;
+    }
+
+    .facility-browser {
+        padding: 44px 0 80px;
+    }
+
+    .facility-item {
+        grid-template-columns: 1fr;
+    }
+
+    .facility-image {
+        min-height: 230px;
+    }
+
+    .facility-content {
+        padding: 24px 22px 22px;
+    }
+
+    .booking-page-section,
+    .guest-page-section {
+        padding: 36px 0 80px;
+    }
+
+    .booking-form-card {
+        padding: 28px 22px 26px;
+    }
+
+    .form-heading h2 {
+        font-size: 42px;
+    }
+
+    .facility-select-grid,
+    .booking-method-grid,
+    .booking-fields-grid,
+    .form-two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-fields-grid {
+        gap: 22px;
+    }
+
+    .booking-form-actions .btn {
+        flex: 1 1 100%;
+    }
+
+    .booking-summary-card {
+        padding: 28px 22px 24px;
+    }
+
+    .auth-page {
+        padding: 36px 0 12px;
+    }
+
+    .auth-intro,
+    .auth-card {
+        padding: 34px 22px 28px;
+    }
+
+    .auth-card-header h2 {
+        font-size: 40px;
+    }
+
+    .guest-login-option {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .auth-information {
+        padding: 48px 0 80px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 4px;
+        padding: 20px 0;
+    }
+
+    .adv-modal-close {
+        top: -12px;
+        right: -4px;
+    }
+}
+
+/* =========================================================
+   14. TRACK + PROFILE — RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+    .track-booking-layout,
+    .profile-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .status-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .track-booking-section {
+        padding: 36px 0 12px;
+    }
+
+    .track-search-card {
+        padding: 32px 22px 26px;
+    }
+
+    .track-search-heading h2 {
+        font-size: 42px;
+    }
+
+    .tracking-ticket-head {
+        padding: 28px 22px 24px;
+    }
+
+    .tracking-progress {
+        padding: 36px 22px 26px;
+    }
+
+    .progress-line {
+        left: calc(22px + (100% - 44px) / 8);
+        right: calc(22px + (100% - 44px) / 8);
+    }
+
+    .progress-step small {
+        font-size: 12px;
+    }
+
+    .tracking-details {
+        grid-template-columns: 1fr;
+        padding: 0 22px;
+    }
+
+    .tracking-status-message {
+        margin: 0 22px;
+    }
+
+    .track-information {
+        padding-top: 56px;
+    }
+
+    .track-info-title {
+        font-size: 36px;
+    }
+
+    .profile-hero {
+        padding: 44px 0 48px;
+    }
+
+    .profile-section {
+        padding: 32px 0 80px;
+    }
+
+    .profile-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .history-card,
+    .status-board {
+        padding: 26px 20px 22px;
+    }
+
+    .history-head h2 {
+        font-size: 36px;
+    }
+
+    /* reservation table becomes stacked cards */
+    .res-table thead {
+        display: none;
+    }
+
+    .res-table,
+    .res-table tbody,
+    .res-table tr,
+    .res-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .res-table tr {
+        padding: 14px 0;
+        border-bottom: 2px solid var(--rule);
+    }
+
+    .res-table tbody tr:last-child {
+        border-bottom: 0;
+    }
+
+    .res-table td,
+    .res-table tbody tr:last-child td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 5px 0;
+        border: 0;
+        text-align: right;
+    }
+
+    .res-table td::before {
+        content: attr(data-label);
+        flex: none;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        text-align: left;
+    }
+
+    .res-table td.res-empty {
+        display: block;
+        text-align: center;
+    }
+
+    .res-table td.res-empty::before {
+        content: none;
+    }
+
+    .profile-modal-body .form-two-column {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 460px) {
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .progress-step span {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .progress-line {
+        top: 54px;
+    }
+}
+
+
+/* =========================================================
+   15. PRINT  (approved booking receipt on track-booking.html)
+========================================================= */
+
+@media print {
+    .no-print,
+    .site-header,
+    .footer,
+    .page-hero,
+    .track-search-card,
+    .track-information {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    .track-booking-section {
+        padding: 0;
+    }
+
+    .track-booking-layout {
+        display: block;
+    }
+
+    .tracking-preview-card {
+        display: block !important;
+        background: #fff !important;
+        border: 2px solid #000;
+        color: #000 !important;
+    }
+
+    .tracking-preview-card *:not(.progress-step.active span) {
+        color: #000 !important;
+    }
+
+    .tracking-preview-card::before,
+    .tracking-progress::before,
+    .tracking-progress::after {
+        display: none;
+    }
+
+    .tracking-status-badge,
+    .progress-step span,
+    .tracking-progress,
+    .tracking-detail,
+    .tracking-status-message {
+        border-color: #000 !important;
+    }
+
+    .progress-step span {
+        background: #fff !important;
+    }
+
+    .progress-step.active span {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .notice-icon,
+    .status-dot {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+/* =========================================================
+   16. CANCEL REQUESTS  (cancel.js: track page + profile)
+   ========================================================= */
+
+.pill-cancel { background: #ffedd5; color: #9a3412; }
+
+.cancel-box {
+    margin-top: 18px;
+    padding: 14px 16px;
+    border: 2px dashed var(--rule);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.cancel-note { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; flex: 1 1 220px; }
+
+.cancel-btn,
+.res-cancel {
+    font: 700 13px/1 'DM Sans', system-ui, sans-serif;
+    letter-spacing: .02em;
+    padding: 10px 14px;
+    background: #fff;
+    color: var(--bad);
+    border: 2px solid var(--bad);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+.cancel-btn:hover,
+.res-cancel:hover { background: var(--bad); color: #fff; }
+.res-cancel { display: inline-block; margin-top: 6px; padding: 6px 10px; font-size: 12px; }
+
+.cx-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(6, 38, 25, .62);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+}
+.cx-dialog {
+    width: min(440px, 100%);
+    background: #fff;
+    border: 2px solid var(--turf);
+    border-radius: 3px;
+    padding: 22px 22px 18px;
+    box-shadow: 0 18px 50px rgba(6, 38, 25, .35);
+}
+.cx-title { margin: 0 0 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 28px; text-transform: uppercase; letter-spacing: .02em; color: var(--turf); }
+.cx-ref { margin: 0 0 12px; font-size: 13px; font-weight: 700; color: var(--pitch); }
+.cx-text { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+.cx-label { display: block; font-size: 13px; font-weight: 700; color: var(--turf); }
+.cx-input {
+    display: block; width: 100%; margin-top: 6px; padding: 11px 12px;
+    font: 500 15px 'DM Sans', system-ui, sans-serif;
+    border: 2px solid var(--rule); border-radius: 3px; background: #fff; color: var(--turf);
+}
+.cx-input:focus { outline: none; border-color: var(--pitch); }
+.cx-msg { min-height: 20px; margin: 10px 0 0; font-size: 13.5px; font-weight: 600; color: var(--bad); }
+.cx-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.cx-btn {
+    font: 700 14px/1 'DM Sans', system-ui, sans-serif;
+    padding: 12px 16px; border-radius: 3px; cursor: pointer;
+    background: #fff; color: var(--turf); border: 2px solid var(--turf);
+}
+.cx-btn:hover { background: var(--surface); }
+.cx-btn.cx-danger { background: var(--bad); border-color: var(--bad); color: #fff; }
+.cx-btn.cx-danger:hover { background: #8f1c12; border-color: #8f1c12; }
+.cx-btn:disabled { opacity: .6; cursor: default; }
+
+.cancel-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.resched-btn,
+.res-resched {
+    font: 700 13px/1 'DM Sans', system-ui, sans-serif;
+    letter-spacing: .02em;
+    padding: 10px 14px;
+    background: #fff;
+    color: var(--turf);
+    border: 2px solid var(--turf);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+.resched-btn:hover,
+.res-resched:hover { background: var(--turf); color: #fff; }
+.res-resched { display: inline-block; margin: 6px 6px 0 0; padding: 6px 10px; font-size: 12px; }
+.res-pending-move { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 600; color: var(--pitch); }
+.cx-btn.cx-primary { background: var(--turf); border-color: var(--turf); color: #fff; }
+.cx-btn.cx-primary:hover { background: var(--pitch); border-color: var(--pitch); }
+select.cx-input { appearance: auto; }
+
+@media print { .cancel-box, .cx-overlay, .res-cancel, .res-resched { display: none !important; } }
+
+
+/* =========================================================
+   NAV: fixed centre position
+   The links are centred on the header itself instead of in the
+   space left between the logo and the buttons, so they stay put
+   when the buttons change width (logged in / out) and when you
+   move between pages. Scrollbar space is reserved for the same reason.
+   ========================================================= */
+html { scrollbar-gutter: stable; }
+
+@media (min-width: 1025px) {
+    .nav-inner { position: relative; }
+    .main-nav {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+    }
+}
+
+
+/* =========================================================
+   PROFILE MENU (logged-in dropdown) - premium restyle
+   script.js builds the markup with inline slate styles, so every
+   rule here uses !important. No "Member Hub" line, no duplicate
+   "Track Active Booking" item (Track Booking is already in the nav).
+   ========================================================= */
+
+.profile-trigger-btn {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border: 2px solid rgba(255, 255, 255, 0.40) !important;
+    border-radius: var(--radius) !important;
+    padding: 5px 12px 5px 6px !important;
+    gap: 10px !important;
+    transition: background .2s, border-color .2s !important;
+}
+.profile-trigger-btn:hover {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.7) !important;
+}
+.profile-avatar-badge {
+    width: 34px !important;
+    height: 34px !important;
+    background: var(--gold) !important;
+    color: var(--turf) !important;
+    border-radius: 2px !important;
+    font-family: var(--font-display) !important;
+    font-size: 16px !important;
+    letter-spacing: .04em !important;
+}
+.profile-meta-info { justify-content: center !important; }
+.profile-name {
+    color: var(--white) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: .01em !important;
+}
+.profile-role { display: none !important; }
+
+/* chevron: the ▼ glyph becomes a thin arrow that flips while open */
+.dropdown-chevron {
+    font-size: 0 !important;
+    width: 8px !important;
+    height: 8px !important;
+    margin: 0 4px 3px 2px !important;
+    border-right: 2px solid rgba(255, 255, 255, 0.8);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+    transform: rotate(45deg);
+    transition: transform .2s;
+}
+.nav-profile-dropdown:has(#profileDropdownMenu[style*="block"]) .dropdown-chevron {
+    transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.profile-dropdown-menu {
+    top: calc(100% + 10px) !important;
+    width: 272px !important;
+    background: var(--white) !important;
+    border: 2px solid var(--turf) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: 0 22px 44px rgba(6, 38, 25, 0.30) !important;
+    font-family: var(--font-body) !important;
+}
+
+/* identity block */
+.profile-dropdown-menu > div:first-child {
+    position: relative;
+    padding: 16px 18px 15px !important;
+    background: var(--turf) !important;
+    border-bottom: 0 !important;
+}
+.profile-dropdown-menu > div:first-child::before {
+    content: "Signed in as";
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+.profile-dropdown-menu > div:first-child strong {
+    color: var(--white) !important;
+    font-family: var(--font-display);
+    font-size: 21px !important;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+.profile-dropdown-menu > div:first-child span {
+    display: block;
+    margin-top: 3px;
+    font-size: 12.5px !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+/* menu items */
+.profile-dropdown-menu > div:nth-child(2) { padding: 8px !important; }
+
+.profile-dropdown-menu a[href="track-booking.html"] { display: none !important; }
+
+.profile-dropdown-menu a[href="profile.html"] {
+    font-size: 0 !important;
+    gap: 12px !important;
+    padding: 11px 12px !important;
+    border-radius: 2px !important;
+    color: var(--turf) !important;
+    background: transparent !important;
+    transition: background .15s !important;
+}
+.profile-dropdown-menu a[href="profile.html"]:hover { background: var(--surface) !important; }
+.profile-dropdown-menu a[href="profile.html"]::before {
+    content: "";
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 2px;
+    background-color: var(--surface);
+    border: 1px solid var(--rule);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f6b3b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px;
+}
+.profile-dropdown-menu a[href="profile.html"]::after {
+    content: "My profile & bookings";
+    flex: 1;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+/* log out */
+.profile-dropdown-menu > div:last-child {
+    padding: 10px 12px 12px !important;
+    background: var(--white) !important;
+    border-top: 1px solid var(--rule) !important;
+}
+.profile-dropdown-menu button {
+    padding: 11px !important;
+    background: transparent !important;
+    color: var(--turf) !important;
+    border: 2px solid var(--turf) !important;
+    border-radius: var(--radius) !important;
+    font-family: var(--font-body) !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: .04em !important;
+    transition: background .15s, color .15s !important;
+}
+.profile-dropdown-menu button:hover {
+    background: var(--turf) !important;
+    color: var(--white) !important;
+    opacity: 1 !important;
+}
+
+
+/* =========================================================
+   FOOTER  (dark turf, contact strip, socials)
+   Later rules override the older simple footer above.
+========================================================= */
+
+.footer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-top: 0;
+    background: linear-gradient(180deg, var(--turf) 0%, var(--turf-deep) 100%);
+    border-top: 4px solid var(--gold);
+    color: var(--white);
+}
+
+/* faint centre-circle line, like a pitch marking */
+.footer::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -140px;
+    top: 90px;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 70px rgba(255, 255, 255, 0.015);
+}
+
+.footer-contact {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    padding-block: 44px 40px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.footer-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.footer-contact-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 2px solid rgba(251, 191, 36, 0.55);
+    border-radius: var(--radius);
+    color: var(--gold);
+}
+
+.footer-contact-icon svg { width: 21px; height: 21px; }
+
+.footer-contact-item small {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.footer-contact-item a,
+.footer-contact-item span:not(.footer-contact-icon) {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--white);
+    overflow-wrap: anywhere;
+}
+
+.footer-contact-item a:hover { color: var(--gold); }
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-block: 52px 56px;
+}
+
+.footer .brand-logo-img { height: 58px; }
+
+.footer-brand p {
+    max-width: 330px;
+    margin-top: 18px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.footer-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.footer-social a {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.28);
+    border-radius: var(--radius);
+    color: var(--white);
+    transition: background .2s, color .2s, border-color .2s;
+}
+
+.footer-social a svg { width: 18px; height: 18px; }
+
+.footer-social a:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--turf);
+}
+
+.footer-column h4 {
+    margin-bottom: 8px;
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+
+.footer-column a {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer-bottom {
+    border-top: 2px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-legal { display: flex; gap: 22px; }
+.footer-legal a { color: rgba(255, 255, 255, 0.6); transition: color .2s; }
+.footer-legal a:hover { color: var(--gold); }
+
+@media (max-width: 1000px) {
+    .footer-contact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 760px) {
+    .footer-contact { grid-template-columns: 1fr; gap: 18px; padding-block: 36px 32px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; padding-block: 40px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 6px; padding: 20px 0; }
+    .footer::before { display: none; }
+}
+
+
+/* =========================================================
+   HEADER on pages with a hero band: transparent at the top,
+   solid green once the visitor scrolls (same as the home page).
+   Login / register keep the solid bar (light form card behind it).
+========================================================= */
+
+body:has(main > .page-hero:first-child) .site-header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(6, 38, 25, 0.62), rgba(6, 38, 25, 0));
+    border-bottom-color: rgba(255, 255, 255, 0.16);
+    transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+
+body:has(main > .page-hero:first-child) .site-header.scrolled {
+    background: var(--pitch);
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 24px rgba(6, 38, 25, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* the fixed bar no longer takes space, so the hero makes room for it */
+body:has(main > .page-hero:first-child) .page-hero {
+    padding-top: calc(76px + var(--nav-h));
+}
+
+@media (max-width: 900px) {
+    body:has(main > .page-hero:first-child) .site-header:has(.mobile-open) {
+        background: var(--turf);
+    }
+}
+
+
+/* =========================================================
+   HEADER colour = footer colour
+   Once the visitor scrolls, the bar turns the same deep turf green as
+   the footer (with the same gold edge), instead of the brighter pitch green.
+========================================================= */
+
+.site-header.scrolled,
+body:has(main > .page-hero:first-child) .site-header.scrolled {
+    background: var(--turf);
+    border-bottom: 3px solid var(--gold);
+    box-shadow: 0 8px 26px rgba(6, 38, 25, 0.35);
+}
+
+/* login / register: the bar is always solid, so it uses the same turf */
+body:not(:has(main > .page-hero:first-child)) .site-header {
+    background: var(--turf);
+}
+
+
+/* payment screenshot in the QR window */
+.qr-field input[type="file"] {
+    height: auto;
+    padding: 12px 0 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+#proofPreview {
+    display: block;
+    max-width: 100%;
+    max-height: 150px;
+    margin-top: 10px;
+    border: 2px solid var(--rule);
+    border-radius: 3px;
+    object-fit: contain;
+    background: #fff;
+}
+#proofPreview[hidden] { display: none; }
+
+
+/* thank-you window after a reservation is paid */
+.ok-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(6, 38, 25, .72);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; overflow-y: auto;
+}
+.ok-dialog {
+    width: min(460px, 100%);
+    background: #fff;
+    border: 2px solid var(--turf);
+    border-top: 6px solid var(--gold);
+    border-radius: 3px;
+    padding: 26px 24px 22px;
+    text-align: center;
+    box-shadow: 0 22px 60px rgba(6, 38, 25, .45);
+}
+.ok-mark {
+    width: 54px; height: 54px; margin: 0 auto 12px;
+    border-radius: 50%;
+    background: var(--turf); color: var(--gold);
+    font-size: 28px; font-weight: 800; line-height: 54px;
+}
+.ok-title {
+    margin: 0 0 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em;
+    color: var(--turf);
+}
+.ok-lead { margin: 0 0 16px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.ok-ref {
+    margin: 0 0 14px; padding: 12px 10px;
+    background: var(--surface); border: 2px dashed var(--rule); border-radius: 3px;
+}
+.ok-ref-label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ok-ref-code { display: block; margin-top: 4px; font-size: 26px; letter-spacing: .04em; color: var(--turf); user-select: all; }
+.ok-list {
+    display: grid; grid-template-columns: auto 1fr; gap: 8px 14px;
+    margin: 0 0 14px; text-align: left; font-size: 14px;
+}
+.ok-list dt { color: var(--muted); }
+.ok-list dd { margin: 0; text-align: right; font-weight: 700; color: var(--turf); }
+.ok-note { margin: 0 0 16px; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.ok-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.ok-btn {
+    font: 700 14px/1 'DM Sans', system-ui, sans-serif;
+    padding: 13px 18px; border-radius: 3px; cursor: pointer;
+    background: #fff; color: var(--turf); border: 2px solid var(--turf);
+}
+.ok-btn:hover { background: var(--surface); }
+.ok-btn.ok-primary { background: var(--gold); border-color: var(--gold); color: var(--turf-deep, #0a2016); }
+.ok-btn.ok-primary:hover { filter: brightness(.95); }
+
+
+/* =========================================================
+   GLASS LAYER  (frosted panels only where there is something to see through)
+   - hero card, facility status pills, dialogs, login/register panel
+   Tables, forms and prices stay solid so they remain easy to read.
+========================================================= */
+
+.facility-status {
+    background: rgba(6, 38, 25, 0.34) !important;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px) saturate(1.5);
+    -webkit-backdrop-filter: blur(10px) saturate(1.5);
+}
+
+/* the page behind a dialog stays visible, softly blurred */
+.qr-modal,
+.cx-overlay,
+.ok-overlay,
+.adv-modal-overlay {
+    background: rgba(6, 38, 25, 0.52);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.qr-card,
+.cx-dialog,
+.ok-dialog {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 30px 70px rgba(6, 38, 25, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(22px) saturate(1.6);
+    -webkit-backdrop-filter: blur(22px) saturate(1.6);
+}
+.ok-dialog { border-top: 6px solid var(--gold); }
+.qr-card { border: 1px solid rgba(255, 255, 255, 0.7); }
+
+/* login / register: soft colour behind a frosted panel */
+.auth-page {
+    background:
+        radial-gradient(760px 420px at 12% 6%, rgba(15, 107, 59, 0.20), transparent 62%),
+        radial-gradient(640px 460px at 92% 92%, rgba(251, 191, 36, 0.20), transparent 62%);
+}
+.auth-layout {
+    background: rgba(255, 255, 255, 0.70);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 30px 70px rgba(6, 38, 25, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .facility-status { background: rgba(6, 38, 25, 0.88) !important; }
+    .qr-modal, .cx-overlay, .ok-overlay, .adv-modal-overlay { background: rgba(6, 38, 25, 0.9); }
+    .qr-card, .cx-dialog, .ok-dialog { background: #ffffff; }
+    .auth-layout { background: #ffffff; }
+}
+@media (prefers-reduced-transparency: reduce) {
+    .facility-status { background: rgba(6, 38, 25, 0.88) !important; }
+    .qr-modal, .cx-overlay, .ok-overlay, .adv-modal-overlay { background: rgba(6, 38, 25, 0.9); }
+    .qr-card, .cx-dialog, .ok-dialog { background: #ffffff; }
+    .auth-layout { background: #ffffff; }
+}
+
+
+/* =========================================================
+   FORGOT PASSWORD DIALOG (login page)
+========================================================= */
+.fp-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; overflow-y: auto;
+    background: rgba(6, 38, 25, .6);
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+.fp-overlay[hidden] { display: none; }
+.fp-dialog {
+    position: relative;
+    width: min(440px, 100%);
+    padding: 28px 26px 24px;
+    background: #fff;
+    border: 2px solid var(--turf);
+    border-top: 6px solid var(--gold);
+    border-radius: 3px;
+    box-shadow: 0 22px 60px rgba(6, 38, 25, .45);
+}
+.fp-dialog h3 {
+    margin: 0 0 6px;
+    font-family: var(--font-display, inherit);
+    font-size: 30px; font-weight: 800; line-height: 1;
+    text-transform: uppercase; color: var(--turf);
+}
+.fp-lead { margin: 0 0 18px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.fp-close {
+    position: absolute; top: 10px; right: 12px;
+    border: 0; background: none; cursor: pointer;
+    font-size: 18px; color: var(--muted);
+}
+.fp-close:hover { color: var(--turf); }
+.fp-step { display: flex; flex-direction: column; gap: 8px; }
+.fp-step[hidden] { display: none; }
+.fp-step label { font-size: 14px; font-weight: 700; color: var(--turf); margin-top: 6px; }
+.fp-step input {
+    width: 100%; padding: 12px 14px; font-size: 16px;
+    border: 1.5px solid #c8d5cd; border-radius: 3px; background: #fff;
+}
+.fp-step input:focus { outline: 2px solid var(--pitch); outline-offset: 1px; border-color: var(--pitch); }
+.fp-code { text-align: center; font-size: 26px !important; letter-spacing: 12px; font-weight: 700; }
+.fp-btn { margin-top: 14px; width: 100%; }
+.fp-link {
+    margin-top: 6px; border: 0; background: none; cursor: pointer;
+    font-size: 14px; font-weight: 600; color: var(--pitch); text-decoration: underline;
+}
+.fp-link:disabled { opacity: .5; cursor: default; }
+.fp-msg { min-height: 20px; margin: 14px 0 0; font-size: 14px; line-height: 1.4; }
+.fp-msg.ok  { color: var(--pitch); }
+.fp-msg.bad { color: #b42318; }
+
+
+/* =========================================================
+   LOGIN PAGE  -  frosted glass card over the MetroGate photo
+   (everything is scoped to #loginPage, register / guest pages are untouched)
+   The photo goes in the img folder as:  img/hero-enhanced.jpg
+========================================================= */
+body#loginPage .auth-page {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 78px);
+    padding: 56px 0;
+    background-color: var(--turf);
+    background-image:
+        linear-gradient(180deg, rgba(6, 38, 25, 0.35) 0%, rgba(6, 38, 25, 0.62) 100%),
+        url("img/hero-enhanced.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+body#loginPage .auth-page > .container { width: 100%; }
+
+body#loginPage .auth-layout {
+    display: block;
+    max-width: 470px;
+    margin: 0 auto;
+    overflow: visible;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body#loginPage .auth-card {
+    padding: 40px 38px 32px;
+    color: #fff;
+    border-radius: 26px;
+    background: linear-gradient(145deg, rgba(13, 43, 30, 0.52), rgba(6, 38, 25, 0.38));
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+}
+
+body#loginPage .auth-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+body#loginPage .auth-card-header h2 { font-size: 40px; color: #fff; }
+body#loginPage .auth-card-header p { color: rgba(255, 255, 255, 0.78); }
+body#loginPage .auth-form { gap: 20px; margin-top: 26px; }
+
+body#loginPage .form-group label { color: rgba(255, 255, 255, 0.86); }
+body#loginPage .form-group input:not([type="checkbox"]) {
+    height: 54px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.12);
+    font-size: 16px;
+    color: #fff;
+    transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+body#loginPage .form-group input::placeholder { color: rgba(255, 255, 255, 0.60); }
+body#loginPage .form-group input:hover { border-color: rgba(255, 255, 255, 0.55); }
+body#loginPage .form-group input:focus {
+    border-color: var(--gold);
+    background-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.28);
+}
+body#loginPage .form-group input:-webkit-autofill {
+    -webkit-text-fill-color: #fff;
+    -webkit-box-shadow: 0 0 0 1000px rgba(13, 43, 30, 0.92) inset;
+    caret-color: #fff;
+}
+
+body#loginPage .form-help-link { color: var(--gold); }
+body#loginPage .form-checkbox label { color: rgba(255, 255, 255, 0.86); font-size: 14px; }
+body#loginPage .form-checkbox input { accent-color: var(--gold); }
+
+body#loginPage .auth-submit {
+    height: 54px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--gold);
+    color: var(--turf);
+    font-size: 16px;
+    font-weight: 800;
+}
+body#loginPage .auth-submit:hover { background: #fff; color: var(--turf); }
+
+body#loginPage .auth-divider { color: rgba(255, 255, 255, 0.70); margin: 24px 0 20px; }
+body#loginPage .auth-divider::before,
+body#loginPage .auth-divider::after { border-top: 1px solid rgba(255, 255, 255, 0.28); }
+
+body#loginPage .guest-login-option {
+    border: 1px dashed rgba(255, 255, 255, 0.45);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+}
+body#loginPage .guest-login-option strong { color: #fff; }
+body#loginPage .guest-login-option p { color: rgba(255, 255, 255, 0.72); }
+body#loginPage .text-link,
+body#loginPage .auth-register a { color: var(--gold); }
+body#loginPage .text-link:hover,
+body#loginPage .auth-register a:hover { color: #fff; }
+body#loginPage .auth-register { color: rgba(255, 255, 255, 0.78); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    body#loginPage .auth-card { background: rgba(6, 38, 25, 0.92); }
+}
+@media (prefers-reduced-transparency: reduce) {
+    body#loginPage .auth-card { background: rgba(6, 38, 25, 0.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (max-width: 560px) {
+    body#loginPage .auth-page { padding: 28px 0 36px; background-attachment: scroll; }
+    body#loginPage .auth-card { padding: 30px 22px 24px; border-radius: 22px; }
+    body#loginPage .auth-card-header h2 { font-size: 34px; }
+    body#loginPage .guest-login-option { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 560px) {
+    body#loginPage .auth-page > .container { padding-left: 16px; padding-right: 16px; }
+}
+
+
+/* =========================================================
+   REGISTER PAGE  -  same frosted glass look as the login page
+   (scoped to #registerPage)
+   The photo goes in the img folder as:  img/hero-enhanced.jpg
+========================================================= */
+body#registerPage .auth-page {
+    display: flex;
+    align-items: center;
+    min-height: calc(100vh - 78px);
+    padding: 56px 0;
+    background-color: var(--turf);
+    background-image:
+        linear-gradient(180deg, rgba(6, 38, 25, 0.35) 0%, rgba(6, 38, 25, 0.62) 100%),
+        url("img/hero-enhanced.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+body#registerPage .auth-page > .container { width: 100%; }
+
+body#registerPage .auth-layout {
+    display: block;
+    max-width: 640px;
+    margin: 0 auto;
+    overflow: visible;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body#registerPage .auth-card {
+    padding: 40px 38px 32px;
+    color: #fff;
+    border-radius: 26px;
+    background: linear-gradient(145deg, rgba(13, 43, 30, 0.52), rgba(6, 38, 25, 0.38));
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+}
+
+body#registerPage .auth-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+body#registerPage .auth-card-header h2 { font-size: 40px; color: #fff; }
+body#registerPage .auth-card-header p { color: rgba(255, 255, 255, 0.78); }
+body#registerPage .auth-form { gap: 20px; margin-top: 26px; }
+
+body#registerPage .form-group label { color: rgba(255, 255, 255, 0.86); }
+body#registerPage .form-group input:not([type="checkbox"]) {
+    height: 54px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 14px;
+    background-color: rgba(255, 255, 255, 0.12);
+    font-size: 16px;
+    color: #fff;
+    transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease;
+}
+body#registerPage .form-group input::placeholder { color: rgba(255, 255, 255, 0.60); }
+body#registerPage .form-group input:hover { border-color: rgba(255, 255, 255, 0.55); }
+body#registerPage .form-group input:focus {
+    border-color: var(--gold);
+    background-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.28);
+}
+body#registerPage .form-group input:-webkit-autofill {
+    -webkit-text-fill-color: #fff;
+    -webkit-box-shadow: 0 0 0 1000px rgba(13, 43, 30, 0.92) inset;
+    caret-color: #fff;
+}
+
+body#registerPage .form-help-link { color: var(--gold); }
+body#registerPage .form-checkbox label { color: rgba(255, 255, 255, 0.86); font-size: 14px; }
+body#registerPage .form-checkbox input { accent-color: var(--gold); }
+
+body#registerPage .auth-submit {
+    height: 54px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--gold);
+    color: var(--turf);
+    font-size: 16px;
+    font-weight: 800;
+}
+body#registerPage .auth-submit:hover { background: #fff; color: var(--turf); }
+
+body#registerPage .auth-divider { color: rgba(255, 255, 255, 0.70); margin: 24px 0 20px; }
+body#registerPage .auth-divider::before,
+body#registerPage .auth-divider::after { border-top: 1px solid rgba(255, 255, 255, 0.28); }
+
+body#registerPage .guest-login-option {
+    border: 1px dashed rgba(255, 255, 255, 0.45);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.06);
+}
+body#registerPage .guest-login-option strong { color: #fff; }
+body#registerPage .guest-login-option p { color: rgba(255, 255, 255, 0.72); }
+body#registerPage .text-link,
+body#registerPage .auth-register a { color: var(--gold); }
+body#registerPage .text-link:hover,
+body#registerPage .auth-register a:hover { color: #fff; }
+body#registerPage .auth-register { color: rgba(255, 255, 255, 0.78); }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    body#registerPage .auth-card { background: rgba(6, 38, 25, 0.92); }
+}
+@media (prefers-reduced-transparency: reduce) {
+    body#registerPage .auth-card { background: rgba(6, 38, 25, 0.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (max-width: 560px) {
+    body#registerPage .auth-page { padding: 28px 0 36px; background-attachment: scroll; }
+    body#registerPage .auth-card { padding: 30px 22px 24px; border-radius: 22px; }
+    body#registerPage .auth-card-header h2 { font-size: 34px; }
+    body#registerPage .guest-login-option { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 560px) {
+    body#registerPage .auth-page > .container { padding-left: 16px; padding-right: 16px; }
+}
+
+body#registerPage .form-two-column { gap: 16px; }
+body#registerPage .auth-form + .auth-register { margin-top: 22px; }
+body#registerPage .form-checkbox label { align-items: flex-start; line-height: 1.5; }
+body#registerPage .auth-card .guest-login-option { margin-top: 22px; }
+
+
+/* =========================================================
+   LOGIN + REGISTER  -  compact so the whole card fits one screen
+   (no footer on these two pages, only a slim line at the bottom)
+========================================================= */
+body#loginPage .auth-page,
+body#registerPage .auth-page {
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    min-height: calc(100vh - 86px);
+    padding: 22px 0 16px;
+}
+body#loginPage .auth-card,
+body#registerPage .auth-card { padding: 26px 32px 20px; border-radius: 22px; }
+body#loginPage .auth-card-header h2,
+body#registerPage .auth-card-header h2 { font-size: 32px; }
+body#loginPage .auth-eyebrow,
+body#registerPage .auth-eyebrow { margin-bottom: 4px; }
+body#loginPage .auth-card-header p,
+body#registerPage .auth-card-header p { margin-top: 6px; font-size: 14px; }
+body#loginPage .auth-form,
+body#registerPage .auth-form { gap: 12px; margin-top: 16px; }
+body#loginPage .form-group,
+body#registerPage .form-group { gap: 5px; }
+body#loginPage .form-group label,
+body#registerPage .form-group label { font-size: 12.5px; }
+body#loginPage .form-group input:not([type="checkbox"]),
+body#registerPage .form-group input:not([type="checkbox"]) { height: 44px; font-size: 15px; border-radius: 12px; }
+body#loginPage .auth-submit,
+body#registerPage .auth-submit { height: 48px; margin-top: 2px; border-radius: 12px; }
+body#loginPage .form-checkbox label,
+body#registerPage .form-checkbox label { font-size: 13px; line-height: 1.4; }
+body#loginPage .auth-divider { margin: 14px 0 12px; }
+body#loginPage .auth-register,
+body#registerPage .auth-register { margin-top: 12px; font-size: 14px; }
+body#registerPage .auth-form + .auth-register { margin-top: 14px; }
+
+/* "Book as guest" becomes one slim row */
+body#loginPage .guest-login-option,
+body#registerPage .guest-login-option { margin-top: 12px; padding: 10px 14px; }
+body#loginPage .guest-login-option p,
+body#registerPage .guest-login-option p { display: none; }
+body#loginPage .guest-login-option strong,
+body#registerPage .guest-login-option strong { font-size: 14px; }
+body#loginPage .text-link,
+body#registerPage .text-link { font-size: 14px; }
+
+body#registerPage .auth-layout { max-width: 660px; }
+body#registerPage .form-two-column { gap: 12px; }
+
+.auth-foot {
+    display: flex; justify-content: center; align-items: center; gap: 18px; flex-wrap: wrap;
+    margin: 0 auto; font-size: 13px; color: rgba(255, 255, 255, 0.72);
+}
+.auth-foot a { color: var(--gold); font-weight: 600; }
+.auth-foot a:hover { color: #fff; }
+
+@media (max-width: 560px) {
+    body#loginPage .auth-page,
+    body#registerPage .auth-page {
+        min-height: calc(100vh - 74px);
+        min-height: calc(100dvh - 74px);
+        padding: 18px 0 20px;
+    }
+    body#loginPage .auth-card,
+    body#registerPage .auth-card { padding: 24px 20px 18px; }
+    body#loginPage .auth-card-header h2,
+    body#registerPage .auth-card-header h2 { font-size: 28px; }
+}
+
+
+/* Register is the tallest form: trim a little more so it fits a laptop screen */
+@media (min-width: 561px) {
+    body#registerPage .auth-card-header p,
+    body#registerPage .guest-login-option { display: none; }
+    body#registerPage .auth-page { padding: 14px 0 12px; gap: 10px; }
+    body#registerPage .auth-card { padding: 22px 32px 16px; }
+    body#registerPage .auth-form { gap: 10px; margin-top: 12px; }
+    body#registerPage .form-group input:not([type="checkbox"]) { height: 42px; }
+    body#registerPage .auth-submit { height: 46px; }
+    body#registerPage .auth-form + .auth-register { margin-top: 10px; }
+}
+body#registerPage .auth-dot { color: rgba(255, 255, 255, 0.5); }
+@media (max-width: 560px) {
+    body#registerPage .guest-login-option { display: none; }
+}
+.auth-foot { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.75); }
+.auth-foot span { color: rgba(255, 255, 255, 0.9); }
+
+
+/* never show white under the photo, whatever the screen height */
+body#loginPage, body#registerPage { background: var(--turf); }
+
+/* keep "Don't have an account?" and "Book as guest" on one row, also on phones
+   (they only wrap to two lines on very narrow screens) */
+@media (max-width: 560px) {
+    body#loginPage .guest-login-option {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px 12px;
+    }
+}
+
+
+/* =========================================================
+   MODERN LAYER — facilities, booking, guest booking, track booking, profile
+   Same look as the glass login: rounded soft cards, photo hero, boxed fields.
+   Everything is scoped to these three pages (booking.html is untouched).
+   To go back to the old look, delete from this banner to the end of the file.
+========================================================= */
+
+body#guestBookingPage,
+body#trackPage,
+body#profilePage,
+body#bookingPage,
+body#facilitiesPage {
+    --card-r: var(--radius);
+    --card-shadow: 0 22px 50px -26px rgba(6, 38, 25, 0.35), 0 2px 6px rgba(6, 38, 25, 0.05);
+    --card-line: 1px solid rgba(13, 43, 30, 0.09);
+}
+
+/* ----- compact photo hero ----- */
+body#guestBookingPage .page-hero,
+body#trackPage .page-hero,
+body#profilePage .page-hero,
+body#bookingPage .page-hero,
+body#facilitiesPage .page-hero {
+    padding: calc(var(--nav-h) + 40px) 0 118px;
+    background:
+        linear-gradient(100deg, rgba(6, 38, 25, 0.93) 8%, rgba(6, 38, 25, 0.72) 55%, rgba(6, 38, 25, 0.55) 100%),
+        url("img/hero-enhanced.jpg") center 42% / cover no-repeat;
+}
+body#guestBookingPage .page-hero::before,
+body#trackPage .page-hero::before,
+body#profilePage .page-hero::before,
+body#bookingPage .page-hero::before,
+body#facilitiesPage .page-hero::before { display: none; }
+
+body#guestBookingPage .page-hero h1,
+body#trackPage .page-hero h1,
+body#profilePage .page-hero h1,
+body#bookingPage .page-hero h1,
+body#facilitiesPage .page-hero h1 {
+    font-size: clamp(38px, 4.8vw, 62px);
+    line-height: 0.95;
+}
+body#guestBookingPage .page-hero h1 span,
+body#trackPage .page-hero h1 span,
+body#bookingPage .page-hero h1 span,
+body#facilitiesPage .page-hero h1 span { display: inline; color: var(--gold); }
+body#profilePage .page-hero h1 span { display: inline; color: var(--gold); }
+body#guestBookingPage .page-hero h1::after,
+body#trackPage .page-hero h1::after,
+body#profilePage .page-hero h1::after,
+body#bookingPage .page-hero h1::after,
+body#facilitiesPage .page-hero h1::after {
+    width: 56px; height: 5px; margin-top: 20px; border-radius: var(--radius);
+}
+body#guestBookingPage .page-hero p,
+body#trackPage .page-hero p,
+body#profilePage .page-hero p,
+body#bookingPage .page-hero p,
+body#facilitiesPage .page-hero p {
+    margin-top: 18px; font-size: 16px; max-width: 560px;
+}
+
+/* cards float over the bottom of the hero */
+body#guestBookingPage .guest-page-section,
+body#trackPage .track-booking-section,
+body#profilePage .profile-section,
+body#bookingPage .booking-page-section,
+body#facilitiesPage .facility-browser {
+    position: relative;
+    z-index: 2;
+    margin-top: -72px;
+    padding-top: 0;
+}
+
+/* ----- soft cards ----- */
+body#guestBookingPage .booking-form-card,
+body#trackPage .track-search-card,
+body#profilePage .history-card,
+body#profilePage .status-board,
+body#profilePage .profile-stat,
+body#bookingPage .booking-form-card {
+    background: var(--white);
+    border: var(--card-line);
+    border-radius: var(--card-r);
+    box-shadow: var(--card-shadow);
+}
+body#guestBookingPage .booking-summary-card,
+body#trackPage .tracking-preview-card,
+body#profilePage .member-card,
+body#bookingPage .booking-summary-card {
+    border-radius: var(--card-r);
+    box-shadow: 0 26px 56px -24px rgba(6, 38, 25, 0.6);
+}
+
+/* ----- boxed fields ----- */
+body#guestBookingPage .booking-field input,
+body#guestBookingPage .booking-field select,
+body#trackPage .form-group input:not([type="checkbox"]),
+body#bookingPage .booking-field input,
+body#bookingPage .booking-field select {
+    height: 52px;
+    padding: 0 16px;
+    background-color: #f5f8f5;
+    border: 1.5px solid #d3e0d6;
+    border-radius: var(--radius);
+    font-size: 16px;
+    transition: border-color .2s, box-shadow .2s, background-color .2s;
+}
+body#guestBookingPage .booking-field select,
+body#bookingPage .booking-field select {
+    padding-right: 40px;
+    background-position: right 14px center;
+}
+body#guestBookingPage .booking-field input:hover,
+body#guestBookingPage .booking-field select:hover,
+body#trackPage .form-group input:hover,
+body#bookingPage .booking-field input:hover,
+body#bookingPage .booking-field select:hover { border-color: #a9c2af; }
+body#guestBookingPage .booking-field input:focus,
+body#guestBookingPage .booking-field select:focus,
+body#trackPage .form-group input:focus,
+body#bookingPage .booking-field input:focus,
+body#bookingPage .booking-field select:focus {
+    background-color: var(--white);
+    border-color: var(--pitch);
+    box-shadow: 0 0 0 4px rgba(15, 107, 59, 0.13);
+}
+body#guestBookingPage .booking-field label,
+body#trackPage .form-group label,
+body#bookingPage .booking-field label { color: var(--text); font-weight: 700; }
+
+/* ============ GUEST BOOKING ============ */
+body#guestBookingPage .booking-form-card,
+body#bookingPage .booking-form-card { padding: 40px 40px 36px; }
+body#guestBookingPage .form-heading h2,
+body#bookingPage .form-heading h2 { font-size: 40px; line-height: 1; }
+body#guestBookingPage .form-section,
+body#bookingPage .form-section { margin-top: 30px; padding-top: 28px; border-top: 1px solid var(--rule); }
+body#guestBookingPage .form-section-title,
+body#bookingPage .form-section-title { align-items: center; margin-bottom: 22px; }
+body#guestBookingPage .form-step-number,
+body#bookingPage .form-step-number {
+    flex: none; display: grid; place-items: center;
+    width: 44px; height: 44px; border-radius: var(--radius);
+    background: var(--turf); color: var(--gold);
+    -webkit-text-stroke: 0; -webkit-text-fill-color: var(--gold);
+    font-size: 20px; line-height: 1; letter-spacing: .02em;
+}
+body#guestBookingPage .form-section-title h3,
+body#bookingPage .form-section-title h3 { font-size: 26px; }
+body#guestBookingPage .schedule-note,
+body#bookingPage .schedule-note {
+    border: 0; border-radius: var(--radius); background: #eef5ef;
+}
+body#guestBookingPage .agreement-check input,
+body#bookingPage .agreement-check input { border-radius: var(--radius); accent-color: var(--pitch); }
+body#guestBookingPage .booking-form-actions,
+body#bookingPage .booking-form-actions { border-top: 1px solid var(--rule); }
+body#guestBookingPage .booking-form-actions .btn,
+body#bookingPage .booking-form-actions .btn { border-radius: var(--radius); }
+body#guestBookingPage .booking-form-actions .btn-dark,
+body#bookingPage .booking-form-actions .btn-dark { background: var(--gold); color: var(--turf); border-color: var(--gold); }
+body#guestBookingPage .booking-form-actions .btn-dark:hover,
+body#bookingPage .booking-form-actions .btn-dark:hover { background: var(--turf); color: var(--white); border-color: var(--turf); }
+
+body#guestBookingPage .booking-summary-card,
+body#bookingPage .booking-summary-card {
+    padding: 30px 28px 26px;
+    background: linear-gradient(160deg, #0d4a30 0%, var(--turf) 55%, var(--turf-deep) 100%);
+    border-top: 4px solid var(--gold);
+}
+body#guestBookingPage .summary-top h2,
+body#bookingPage .summary-top h2 { font-size: 34px; line-height: 1; }
+body#guestBookingPage .summary-preview,
+body#bookingPage .summary-preview { border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius); background: rgba(255,255,255,.05); }
+body#guestBookingPage .summary-preview-image,
+body#bookingPage .summary-preview-image { border-radius: var(--radius); }
+
+/* the three notes at the bottom become small cards */
+body#guestBookingPage .auth-information,
+body#trackPage .auth-information,
+body#bookingPage .auth-information { padding: 56px 0 90px; }
+body#guestBookingPage .auth-info-grid,
+body#trackPage .auth-info-grid,
+body#bookingPage .auth-info-grid { gap: 18px; }
+body#guestBookingPage .auth-info-item,
+body#trackPage .auth-info-item,
+body#guestBookingPage .auth-info-item:first-child,
+body#trackPage .auth-info-item:first-child,
+body#bookingPage .auth-info-item,
+body#bookingPage .auth-info-item:first-child {
+    padding: 22px 24px; border: var(--card-line); border-radius: var(--radius);
+    background: var(--white); box-shadow: 0 10px 28px -20px rgba(6, 38, 25, 0.35);
+}
+body#guestBookingPage .auth-info-item h3,
+body#trackPage .auth-info-item h3,
+body#bookingPage .auth-info-item h3 { font-size: 22px; }
+body#guestBookingPage .auth-info-item p,
+body#trackPage .auth-info-item p,
+body#bookingPage .auth-info-item p { font-size: 15px; }
+body#trackPage .auth-info-number {
+    display: grid; place-items: center; width: 40px; height: 40px;
+    border-radius: var(--radius); background: var(--turf); color: var(--gold);
+    -webkit-text-stroke: 0; -webkit-text-fill-color: var(--gold);
+    font-size: 20px; line-height: 1;
+}
+body#trackPage .track-info-title { font-size: 30px; margin-bottom: 20px; }
+
+/* ============ TRACK BOOKING ============ */
+body#trackPage .track-search-card { padding: 38px 36px 30px; }
+body#trackPage .track-search-heading h2 { font-size: 40px; line-height: 1; }
+body#trackPage .tracking-form { margin-top: 26px; gap: 22px; }
+body#trackPage .tracking-submit { border-radius: var(--radius); height: 52px; }
+body#trackPage .tracking-help-box { border-top: 1px solid var(--rule); }
+body#trackPage .tracking-help-icon { border-radius: var(--radius); background: #eef5ef; border-width: 0; }
+body#trackPage .tracking-preview-card { background: linear-gradient(160deg, #0d4a30 0%, var(--turf) 55%, var(--turf-deep) 100%); }
+body#trackPage .tracking-status-badge { background: rgba(255,255,255,.08); border-width: 1px; }
+
+/* ============ PROFILE ============ */
+body#profilePage .profile-layout {
+    display: grid; grid-template-columns: 330px minmax(0, 1fr);
+    gap: 26px; align-items: start; margin-top: 0;
+}
+body#profilePage .profile-main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+
+body#profilePage .member-card {
+    position: sticky; top: calc(var(--nav-h) + 18px);
+    padding: 34px 26px 26px;
+    background: linear-gradient(165deg, #0d4a30 0%, var(--turf) 55%, var(--turf-deep) 100%);
+    border-top: 4px solid var(--gold);
+    text-align: center;
+}
+body#profilePage .member-top { display: flex; flex-direction: column; align-items: center; gap: 0; }
+body#profilePage .member-avatar {
+    display: grid; place-items: center; width: 92px; height: 92px; margin-bottom: 16px;
+    border-radius: 50%; background: var(--gold); color: var(--turf);
+    font-family: var(--font-display); font-size: 38px; font-weight: 800; letter-spacing: .02em;
+    box-shadow: 0 0 0 5px rgba(251, 191, 36, .22), 0 0 0 10px rgba(251, 191, 36, .08);
+}
+body#profilePage .member-top h2 {
+    font-family: var(--font-display); font-size: 32px; line-height: 1; text-transform: uppercase;
+    color: var(--white); overflow-wrap: anywhere;
+}
+body#profilePage .member-badge {
+    margin-top: 12px; padding: 5px 13px; border-radius: var(--radius);
+    background: rgba(251, 191, 36, .14); border: 1px solid rgba(251, 191, 36, .4);
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--gold);
+}
+body#profilePage .member-details { margin: 26px 0 0; text-align: left; }
+body#profilePage .member-details > div {
+    display: grid; grid-template-columns: 38px minmax(0, 1fr); column-gap: 14px; align-items: center;
+    padding: 14px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, .1);
+}
+body#profilePage .member-details svg {
+    grid-row: 1 / span 2; width: 38px; height: 38px; padding: 10px; box-sizing: border-box;
+    border-radius: var(--radius); background: rgba(255, 255, 255, .08); color: var(--gold);
+}
+body#profilePage .member-details dt {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: rgba(255, 255, 255, .55);
+}
+body#profilePage .member-details dd {
+    margin: 2px 0 0; font-size: 15px; font-weight: 600; color: var(--white); overflow-wrap: anywhere;
+}
+body#profilePage .member-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+body#profilePage .member-actions .btn { width: 100%; border-radius: var(--radius); height: 50px; }
+body#profilePage .member-book { background: var(--gold); color: var(--turf); border: 0; }
+body#profilePage .member-book:hover { background: var(--gold-soft); }
+body#profilePage .member-track {
+    background: transparent; color: var(--white); border: 1.5px solid rgba(255, 255, 255, .3);
+}
+body#profilePage .member-track:hover { background: rgba(255, 255, 255, .1); }
+body#profilePage .member-logout {
+    margin-top: 4px; padding: 8px; background: none; border: 0; cursor: pointer;
+    font: inherit; font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, .65);
+}
+body#profilePage .member-logout:hover { color: var(--white); text-decoration: underline; }
+
+body#profilePage .profile-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; }
+body#profilePage .profile-stat { position: relative; padding: 20px 22px 20px; border-top: var(--card-line); }
+body#profilePage .profile-stat::before,
+body#profilePage .profile-stat-pending::before { display: none; }
+body#profilePage .ps-ico {
+    display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: 14px;
+    border-radius: var(--radius); background: #e6f1e9; color: var(--pitch);
+}
+body#profilePage .ps-ico svg { width: 20px; height: 20px; }
+body#profilePage .profile-stat-pending .ps-ico { background: #fef3c7; color: #b45309; }
+body#profilePage .profile-stat-label { font-size: 13px; font-weight: 700; color: var(--muted); }
+body#profilePage .profile-stat-value { font-size: 40px; line-height: 1.05; }
+body#profilePage .profile-stat-money { font-size: 32px; }
+body#profilePage .profile-stat-sub { font-size: 13px; }
+
+body#profilePage .history-card,
+body#profilePage .status-board { padding: 28px 28px 24px; }
+body#profilePage .history-head h2 { font-size: 30px; line-height: 1; }
+body#profilePage .history-head p { font-size: 14px; }
+body#profilePage .res-table th {
+    font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--rule);
+}
+body#profilePage .res-table td { border-bottom: 1px solid #e6eee8; }
+body#profilePage .res-resched,
+body#profilePage .res-cancel { border-radius: var(--radius); }
+
+body#profilePage .status-grid { gap: 12px; }
+body#profilePage .profile-status-card strong { font-size: 24px; overflow-wrap: anywhere; }
+body#guestBookingPage .guest-page-section,
+body#bookingPage .booking-page-section { padding-bottom: 24px; }
+body#profilePage .profile-status-card { border-radius: var(--radius); }
+
+/* ============ MOBILE ============ */
+@media (max-width: 900px) {
+    body#guestBookingPage .guest-page-section,
+body#trackPage .track-booking-section,
+body#profilePage .profile-section,
+body#bookingPage .booking-page-section,
+body#facilitiesPage .facility-browser { margin-top: -64px; }
+    body#profilePage .profile-layout { grid-template-columns: minmax(0, 1fr); }
+    body#profilePage .member-card { position: relative; top: auto; }
+}
+@media (max-width: 640px) {
+    body#guestBookingPage .page-hero,
+body#trackPage .page-hero,
+body#profilePage .page-hero,
+body#bookingPage .page-hero,
+body#facilitiesPage .page-hero { padding: calc(var(--nav-h) + 24px) 0 100px; }
+    body#guestBookingPage .booking-form-card,
+body#bookingPage .booking-form-card { padding: 28px 20px 24px; }
+    body#guestBookingPage .form-heading h2,
+body#bookingPage .form-heading h2 { font-size: 32px; }
+    body#trackPage .track-search-card { padding: 28px 20px 24px; }
+    body#profilePage .profile-stats { grid-template-columns: minmax(0, 1fr); }
+    body#profilePage .res-table td.res-remarks { flex-wrap: wrap; justify-content: flex-end; row-gap: 8px; }
+    body#profilePage .res-table td.res-remarks::before { flex: 1 0 100%; }
+    body#profilePage .res-table td.res-remarks br { display: none; }
+    body#profilePage .history-card,
+body#profilePage .status-board { padding: 22px 16px 18px; }
+}
+
+
+/* ============ FACILITIES ============ */
+body#facilitiesPage .facility-browser { padding-bottom: 84px; }
+body#facilitiesPage .facility-item {
+    background: var(--white);
+    border: var(--card-line);
+    border-radius: var(--card-r);
+    box-shadow: var(--card-shadow);
+    transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+body#facilitiesPage .facility-item:hover {
+    border-color: rgba(13, 43, 30, 0.09);
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -26px rgba(6, 38, 25, 0.45), 0 2px 6px rgba(6, 38, 25, 0.05);
+}
+body#facilitiesPage .facility-content { padding: 26px 26px 24px; }
+body#facilitiesPage .facility-category {
+    padding: 4px 11px; border-radius: var(--radius); background: #e6f1e9; font-size: 12px; letter-spacing: .04em;
+}
+body#facilitiesPage .facility-content h3 { margin-top: 10px; font-size: 38px; }
+body#facilitiesPage .facility-info-row span {
+    border: 0; border-radius: var(--radius); background: #eef5ef; color: var(--pitch); padding: 5px 12px;
+}
+body#facilitiesPage .facility-bottom a { border-radius: var(--radius); background: var(--gold); color: var(--turf); }
+body#facilitiesPage .facility-bottom a:hover { background: var(--turf); color: var(--white); }
+
+/* ============ BOOKING (extra) ============ */
+body#bookingPage .facility-choice-content,
+body#bookingPage .booking-method-content {
+    background: #f5f8f5; border: 1.5px solid #d3e0d6; border-radius: var(--radius);
+}
+body#bookingPage .facility-choice:hover .facility-choice-content,
+body#bookingPage .booking-method:hover .booking-method-content { border-color: var(--pitch); }
+body#bookingPage .choice-icon,
+body#bookingPage .method-icon { border-radius: var(--radius); }
+body#bookingPage .facility-choice input:checked + .facility-choice-content,
+body#bookingPage .booking-method input:checked + .booking-method-content { background: var(--turf); border-color: var(--turf); }
+body#bookingPage .time-slot span {
+    background: #f5f8f5; border: 1.5px solid #d3e0d6; border-radius: var(--radius);
+}
+body#bookingPage .time-slot:hover span { border-color: var(--pitch); }
+body#bookingPage .time-slot input:checked + span { background: var(--gold); border-color: var(--gold); color: var(--turf); }
+body#bookingPage .booking-field input[type="date"] { background-position: right 14px center; }
+body#bookingPage .booking-page-section { padding-bottom: 80px; }
+
+
+/* =========================================================
+   ARENA LAYER — inner pages
+   Same sports look as the home page: Moldex Realty logo colours
+   (ember, orange, amber, lime, leaf green), italic condensed type,
+   slanted buttons, diagonal hero edge. Sharp corners.
+   Pages: facilities, booking, guest booking, track booking, login,
+   register, profile.
+   To go back to the previous look, delete from this banner to the
+   end of the file.
+========================================================= */
+
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) {
+    --head: var(--font-display);
+    --ember: #d9502f;
+    --orange: #ef7435;
+    --amber: #eaa63a;
+    --lime: #dcd650;
+    --leaf: #3a7a3e;
+    --forest: #0d2b1e;
+    --deep: #091d14;
+    --ink: #10271c;
+    --sunset: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%);
+    --cut: 14px;
+    /* the old gold accents now use the logo orange / amber */
+    --gold: #ef7435;
+    --gold-soft: #eaa63a;
+    --turf: #0d2b1e;
+    --turf-deep: #091d14;
+    --surface: #f4f2ec;
+    background: var(--surface);
+}
+
+/* ----- header ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-link {
+    font-family: var(--head);
+    font-size: 15px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .btn {
+    min-height: 42px;
+    padding: 0 26px;
+    font-size: 15px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    box-shadow: none;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .btn:hover { background: #fff; color: var(--deep); }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header.scrolled,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage):has(main > .page-hero:first-child) .site-header.scrolled {
+    background: var(--forest);
+    border-bottom: 3px solid var(--orange);
+}
+
+/* ----- buttons: slanted sides, sunset fill ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn {
+    border: 0;
+    border-radius: 0;
+    font-family: var(--head);
+    font-size: 18px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    clip-path: polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+    transition: filter .2s ease, background-color .2s ease, color .2s ease, transform .2s ease;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn:hover { transform: none; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-large { min-height: 54px; padding: 0 38px; font-size: 18px; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-dark,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-primary,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-blue { background: var(--sunset); color: var(--deep); }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-dark:hover,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-primary:hover,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-blue:hover { background: var(--sunset); filter: brightness(1.08) saturate(1.1); }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-outline { background: rgba(13, 43, 30, 0.1); color: var(--forest); box-shadow: none; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-outline:hover { background: var(--forest); color: #fff; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .btn-outline { background: rgba(255, 255, 255, 0.14); color: #fff; }
+
+/* ----- hero band ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero {
+    padding: calc(76px + var(--nav-h) + 6px) 0 128px;
+    background:
+        linear-gradient(105deg, rgba(12, 14, 13, 0.90) 0%, rgba(14, 18, 16, 0.66) 46%, rgba(10, 12, 11, 0.20) 100%),
+        linear-gradient(0deg, rgba(8, 10, 9, 0.40) 0%, rgba(8, 10, 9, 0) 40%),
+        url("img/hero-enhanced.jpg") center 42% / cover no-repeat;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 54px), 0 100%);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero h1 {
+    font-family: var(--head);
+    font-weight: 800;
+    font-style: italic;
+    font-size: clamp(44px, 5.6vw, 80px);
+    line-height: 0.9;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero h1 span {
+    display: inline-block;
+    padding-right: 0.08em;
+    background: var(--sunset);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero h1::after {
+    content: "";
+    display: block;
+    width: 92px;
+    height: 10px;
+    margin-top: 22px;
+    background: var(--sunset);
+    transform: skewX(-26deg);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero p { max-width: 560px; font-size: 18px; color: rgba(255, 255, 255, 0.84); }
+
+/* ----- white cards: sharp, with a sunset rule on top ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-form-card,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .track-search-card,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .profile-stat,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .history-card,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .status-board,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .facility-item,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-card {
+    border-radius: 0;
+    border-width: 5px 0 0;
+    border-style: solid;
+    border-image: var(--sunset) 1;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .tracking-preview-card,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-summary-card {
+    border-radius: 0;
+    border-width: 5px 0 0;
+    border-style: solid;
+    border-image: var(--sunset) 1;
+    background: linear-gradient(160deg, var(--forest) 0%, var(--deep) 100%);
+}
+
+/* ----- headings inside cards ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .form-heading h2,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .summary-top h2,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .track-search-heading h2,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .history-head h2,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .status-board h2,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .facility-content h3,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .form-section-title h3,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-intro h1,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-card h1,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-card h2,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .track-info-title,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-info-item h3 {
+    font-family: var(--head);
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0.005em;
+    text-transform: uppercase;
+}
+
+/* ----- number badges and small tags ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .form-step-number,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-info-number {
+    border-radius: 0;
+    background: var(--sunset);
+    color: var(--deep);
+    -webkit-text-fill-color: var(--deep);
+    -webkit-text-stroke: 0;
+    font-family: var(--head);
+    font-style: italic;
+    font-weight: 800;
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .facility-category {
+    border-radius: 0;
+    background: rgba(239, 116, 53, 0.14);
+    color: var(--ember);
+    font-family: var(--head);
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* ----- choices: selected = sunset ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .time-slot input:checked + span {
+    background: var(--sunset);
+    border-color: transparent;
+    color: var(--deep);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .facility-choice input:checked + .facility-choice-content,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-method input:checked + .booking-method-content {
+    border-color: var(--orange);
+    box-shadow: inset 4px 0 0 var(--orange);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-field input:focus,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-field select:focus,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .form-group input:focus,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .tracking-form input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(239, 116, 53, 0.22); }
+
+/* ----- facilities page: price + book row ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .facility-bottom a { background: var(--sunset); color: var(--deep); }
+
+/* ----- profile: single column now that the member box is gone ----- */
+body#profilePage .profile-layout { display: block; }
+body#profilePage .profile-main { max-width: none; }
+body#profilePage .status-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* ----- footer ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer {
+    background: var(--forest);
+    border-top: 0;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer::before {
+    display: block;
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 6px;
+    width: auto;
+    opacity: 1;
+    transform: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #ef7435;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-column h4 {
+    font-family: var(--head);
+    font-size: 17px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-column a:hover,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-contact-item a:hover { color: var(--amber); }
+
+/* ----- login / register ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-submit {
+    border-radius: 0;
+    background: var(--sunset);
+    color: var(--deep);
+    font-family: var(--head);
+    font-size: 19px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    clip-path: polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .auth-submit:hover { background: var(--sunset); filter: brightness(1.08) saturate(1.1); }
+
+@media (max-width: 1000px) {
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero { padding-bottom: 104px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 36px), 0 100%); }
+    body#profilePage .status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero h1 { font-size: clamp(40px, 12vw, 58px); }
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn-large { padding: 0 26px; }
+}
+
+/* ----- login / register: same bar colour as every other page,
+         and court lines instead of the photo ----- */
+body#loginPage .site-header,
+body#registerPage .site-header {
+    background: var(--forest);
+    border-bottom: 3px solid var(--orange);
+}
+body#loginPage .auth-page,
+body#registerPage .auth-page {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 70% 60% at 50% 40%, rgba(58, 122, 62, 0.28) 0%, rgba(58, 122, 62, 0) 70%),
+        linear-gradient(180deg, var(--forest) 0%, var(--deep) 100%);
+    background-attachment: scroll;
+}
+body#loginPage .auth-page::before,
+body#registerPage .auth-page::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -6%;
+    top: 50%;
+    width: min(780px, 62vw);
+    aspect-ratio: 4 / 3;
+    opacity: 0.10;
+    transform: translateY(-50%) rotate(-8deg);
+    background: var(--court-full) center / contain no-repeat;
+    pointer-events: none;
+}
+body#loginPage .auth-page::after,
+body#registerPage .auth-page::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -8%;
+    bottom: -12%;
+    width: min(620px, 52vw);
+    aspect-ratio: 4 / 3;
+    opacity: 0.08;
+    transform: rotate(10deg);
+    background: var(--court-half) center / contain no-repeat;
+    pointer-events: none;
+}
+body#loginPage .auth-card,
+body#registerPage .auth-card { background: rgba(5, 31, 21, 0.78); }
+
+/* the sport name is already in the court's title, so the small label above it is hidden */
+body#facilitiesPage .facility-category { display: none; }
+
+
+/* ----- no round shapes: pills and login / register fields ----- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .facility-status,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .tracking-status-badge,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .pill,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .status-badge-el { border-radius: 0; }
+body:is(#loginPage, #registerPage) .form-group input:not([type="checkbox"]),
+body:is(#loginPage, #registerPage) .guest-login-option { border-radius: 0; }
+
+/* ----- facility cards: same price and Book button as the home page cards ----- */
+body#facilitiesPage .price-label {
+    font-family: var(--head);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+body#facilitiesPage .facility-price strong {
+    font-family: var(--head);
+    font-size: 40px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0;
+}
+body#facilitiesPage .facility-bottom a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 26px;
+    border-radius: 0;
+    background: var(--sunset);
+    color: var(--deep);
+    font-family: var(--head);
+    font-size: 16px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    transition: filter .2s ease, transform .2s ease;
+}
+body#facilitiesPage .facility-bottom a:hover { background: var(--sunset); color: var(--deep); filter: brightness(1.08) saturate(1.1); transform: none; }
+
+/* footer: same content as the home page (no placeholder social links; the legal links now open the Privacy Policy / Terms pop-ups) */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) #footerGuestLink { display: none !important; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-column a[href="guest-booking.html"] { display: none !important; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-contact-icon { border-color: rgba(239, 116, 53, 0.6); border-radius: 0; color: var(--orange); }
+
+/* flat hero bottom edge (no diagonal) */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .page-hero { clip-path: none; }
+
+/* track booking: both cards same height */
+body#trackPage .track-booking-layout { align-items: stretch; }
+body#trackPage .track-search-card { display: flex; flex-direction: column; }
+body#trackPage .track-search-card .track-links { margin-top: auto; padding-top: 22px; }
+
+/* buttons: hover lightens with an inset glow instead of a filter (a filter on a slanted, clipped button flashes a plain box) */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) :is(.btn, .btn-blue, .auth-submit, .facility-bottom a) { transition: box-shadow .18s ease, color .18s ease, background-color .18s ease; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) :is(.btn, .btn-blue, .auth-submit, .facility-bottom a):hover { filter: none; box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0.16); }
+body#facilitiesPage .facility-bottom a { transition: box-shadow .18s ease; }
+body#facilitiesPage .facility-bottom a:hover { filter: none; }
+
+/* footer legal links open the Privacy Policy / Terms of Use pop-ups (legal.js) */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-legal { display: flex; gap: 24px; }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-legal a { font-size: 14px; color: rgba(255, 255, 255, 0.66); }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-legal a:hover { color: var(--amber); }
+
+/* footer social icons: same as the home page */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a { border-radius: 0; border-color: rgba(239, 116, 53, 0.6); color: var(--orange); }
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a:hover { background: var(--sunset); border-color: transparent; color: var(--deep); }
+/* ---- cleanup: simpler footer, booking note ---- */
+@media (min-width: 901px) {
+    .footer-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+.booking-form-actions .booking-back { align-self: center; font-weight: 700; }
+.booking-account-note { margin: 16px 0 0; font-size: 14px; line-height: 1.5; color: #5b6472; }
+.booking-account-note[hidden] { display: none; }
+.booking-account-note a { font-weight: 700; text-decoration: underline; }
+
+
+/* ---------- laptop screens: Windows scaling of 125% to 150% leaves about 650 to 800 px of height ---------- */
+/* the page title band gets shorter so the real content starts higher up */
+@media (min-width: 901px) and (max-height: 800px) {
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #profilePage) .page-hero {
+        padding-top: calc(var(--nav-h) + 30px);
+        padding-bottom: 88px;
+    }
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #profilePage) .page-hero h1 {
+        font-size: clamp(34px, 4vw, 50px);
+    }
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #profilePage) .page-hero p {
+        margin-top: 10px;
+        font-size: 16px;
+    }
+    body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #profilePage) .page-hero h1::after {
+        margin-top: 14px;
+    }
+}
+
+/* ---- footer: three even columns ---- */
+@media (min-width: 701px) {
+    .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 48px; align-items: start; padding-block: 44px 48px; }
+    .footer-brand { flex: none; }
+    .footer-column { min-width: 0; }
+}
+.footer-brand p { margin-top: 14px; max-width: 320px; }
+.footer-column h4 { margin-bottom: 14px; }
+.footer-column a { display: block; padding: 5px 0; }
+.footer-follow .footer-social { margin-top: 0; }
+.footer-follow .footer-social a { display: grid; padding: 0; }
+@media (max-width: 700px) {
+    .footer-grid { display: grid; grid-template-columns: 1fr; gap: 28px; padding-block: 36px; }
+}
+
+/* ---- facilities: "coming soon" preview (not bookable) ---- */
+.soon-section { padding: 0 0 96px; }
+.soon-head { max-width: 640px; margin: 0 0 28px; padding-top: 12px; border-top: 1px solid rgba(13, 43, 30, 0.14); }
+.soon-head h2 { margin: 10px 0 8px; font-family: var(--head, 'Barlow Condensed', sans-serif); font-style: italic; font-weight: 800; font-size: 38px; line-height: 1; text-transform: uppercase; color: var(--forest, #0a3624); }
+.soon-head p { margin: 0; color: rgba(13, 43, 30, 0.68); font-size: 16px; line-height: 1.55; }
+.soon-eyebrow { display: inline-block; padding-top: 14px; font-family: var(--head, 'Barlow Condensed', sans-serif); font-style: italic; font-weight: 700; font-size: 15px; letter-spacing: .2em; text-transform: uppercase; color: #b53d14; }
+body#facilitiesPage .facility-item.is-soon { cursor: default; background: #fbfbf8; box-shadow: none; border-style: dashed; }
+body#facilitiesPage .facility-item.is-soon:hover { transform: none; box-shadow: none; border-color: rgba(13, 43, 30, 0.09); }
+.facility-item.is-soon .facility-image { min-height: 240px; cursor: default; background: linear-gradient(150deg, #0f3a28, #0a2a1d); }
+.facility-item.is-soon .facility-image img { filter: saturate(.55) brightness(.82); transform: none !important; }
+.facility-item.is-soon .facility-status.soon-badge { background: rgba(6, 38, 25, 0.9) !important; color: #f2b33d !important; border: 1px solid rgba(242, 179, 61, .6); }
+.facility-item.is-soon .facility-status.soon-badge::before { background: #f2b33d !important; }
+.facility-item.is-soon .facility-price strong { font-size: 20px; color: rgba(13, 43, 30, 0.7); }
+.facility-item.is-soon .facility-bottom::before { display: none; }
+@media (max-width: 700px) {
+    .soon-head h2 { font-size: 30px; }
+    .soon-section { padding-bottom: 64px; }
+}
+body#facilitiesPage .facility-item.is-soon .facility-price strong { font-family: 'DM Sans', system-ui, sans-serif; font-style: normal; font-weight: 700; font-size: 18px; letter-spacing: 0; text-transform: none; line-height: 1.2; }
+.facility-item.is-soon .facility-image::before, .facility-item.is-soon .facility-image::after { display: none !important; }
+
+/* ---- footer: split layout (brand + social on the left, contact on the right) ---- */
+.footer-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 0; padding-block: 0; }
+.footer-panel { padding: 48px 48px 48px 0; background: rgba(255, 255, 255, 0.05); position: relative; }
+.footer-panel::before { content: ""; position: absolute; top: 0; bottom: 0; right: 100%; width: 100vw; background: rgba(255, 255, 255, 0.05); }
+.footer-panel .brand-logo-img { height: 58px; width: auto; }
+.footer-panel p { margin: 18px 0 22px; max-width: 320px; font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, 0.75); }
+.footer-panel .footer-social { margin: 0; }
+.footer-info { padding: 48px 0 48px 56px; }
+.footer-info h4 { margin: 0 0 22px; font-family: "DM Sans", system-ui, sans-serif; font-style: normal; font-size: 12.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber, #f2b33d); }
+.footer-info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
+.fi-item small { display: block; margin-bottom: 5px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+.fi-item a, .fi-item span { font-size: 15.5px; font-weight: 600; line-height: 1.4; color: #fff; text-decoration: none; }
+.fi-item a:hover { color: var(--amber, #f2b33d); }
+.footer .footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px 28px; flex-wrap: wrap; }
+.footer-bottom-links { display: flex; align-items: center; gap: 12px 28px; flex-wrap: wrap; }
+.footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+.footer-links a { color: rgba(255, 255, 255, 0.7); transition: color .2s; }
+.footer-links a:hover { color: var(--amber, #f2b33d); }
+@media (max-width: 900px) {
+    .footer-split { grid-template-columns: 1fr; }
+    .footer-panel { padding: 36px 0 12px; background: none; }
+    .footer-panel::before { display: none; }
+    .footer-info { padding: 28px 0 36px; }
+}
+@media (max-width: 560px) {
+    .footer-info-grid { grid-template-columns: 1fr; gap: 20px; }
+}
+
+
+/* =====================================================================
+   LOGIN + REGISTER v2: no header, logo above a clean centred card,
+   no helper text, no placeholders. (Appended last: overrides the glass-card styles above.)
+   ===================================================================== */
+body:is(#loginPage, #registerPage) .auth-page {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 28px 0 18px; gap: 20px;
+}
+body:is(#loginPage, #registerPage) .auth-page > .container { width: 100%; }
+.auth-logo { display: block; flex: none; position: relative; z-index: 2; }
+.auth-logo img { display: block; height: 76px; width: auto; }
+
+body:is(#loginPage, #registerPage) .auth-layout { max-width: 440px; margin: 0 auto; }
+body#registerPage .auth-layout { max-width: 640px; }
+
+body:is(#loginPage, #registerPage) .auth-card {
+    padding: 34px 34px 26px; border-radius: 4px; color: #fff;
+    background: rgba(8, 36, 25, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.12); border-left: 4px solid #ef7435;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+body:is(#loginPage, #registerPage) .auth-card-header { text-align: center; }
+body:is(#loginPage, #registerPage) .auth-card-header h2 {
+    margin: 0; font-family: var(--font-display, 'Barlow Condensed', sans-serif); font-style: italic; font-weight: 800;
+    font-size: 40px; line-height: 1; letter-spacing: 0; text-transform: uppercase; color: #fff;
+}
+body:is(#loginPage, #registerPage) .auth-form { gap: 16px; margin-top: 24px; }
+body:is(#loginPage, #registerPage) .form-group label { font-size: 14px; font-weight: 600; color: rgba(255, 255, 255, 0.9); }
+body:is(#loginPage, #registerPage) .form-group input:not([type="checkbox"]) {
+    height: 50px; padding: 0 14px; border-radius: 3px; font-size: 16px; color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.30); background-color: rgba(255, 255, 255, 0.07);
+}
+body:is(#loginPage, #registerPage) .form-group input:not([type="checkbox"]):focus {
+    border-color: #ef7435; box-shadow: 0 0 0 3px rgba(239, 116, 53, 0.30); background-color: rgba(255, 255, 255, 0.10);
+}
+body:is(#loginPage, #registerPage) .form-help-link { font-size: 13px; color: #f2b33d; }
+body:is(#loginPage, #registerPage) .form-checkbox label { font-size: 14px; color: rgba(255, 255, 255, 0.85); }
+body:is(#loginPage, #registerPage) .form-checkbox input { accent-color: #ef7435; }
+body:is(#loginPage, #registerPage) .auth-submit {
+    height: 52px; border-radius: 3px; border: 0; width: 100%;
+    background: linear-gradient(95deg, #d9502f 0%, #ef7435 40%, #eaa63a 100%); color: #0a1f15;
+    font-family: var(--font-display, 'Barlow Condensed', sans-serif); font-style: italic; font-weight: 800; font-size: 20px; letter-spacing: .08em; text-transform: uppercase;
+}
+body:is(#loginPage, #registerPage) .auth-submit:hover { filter: brightness(1.08); background: linear-gradient(95deg, #d9502f 0%, #ef7435 40%, #eaa63a 100%); color: #0a1f15; }
+body:is(#loginPage, #registerPage) .auth-register { margin-top: 20px; text-align: center; font-size: 15px; color: rgba(255, 255, 255, 0.78); display: block; }
+body:is(#loginPage, #registerPage) .auth-register a { margin-left: 6px; color: #f2b33d; font-weight: 600; }
+body:is(#loginPage, #registerPage) .auth-register a:hover { color: #fff; }
+body:is(#loginPage, #registerPage) .auth-divider { margin: 18px 0 14px; color: rgba(255, 255, 255, 0.55); }
+.auth-guest { text-align: center; }
+.auth-guest a { font-size: 15px; font-weight: 600; color: #fff; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(255, 255, 255, 0.4); }
+.auth-guest a:hover { color: #f2b33d; }
+body#registerPage .auth-register { margin-top: 18px; }
+body#registerPage .auth-guest { margin-top: 10px; }
+body:is(#loginPage, #registerPage) .auth-foot { margin: 0; }
+@media (max-width: 560px) {
+    .auth-logo img { height: 60px; }
+    body:is(#loginPage, #registerPage) .auth-card { padding: 26px 20px 22px; }
+    body:is(#loginPage, #registerPage) .auth-card-header h2 { font-size: 32px; }
+}
+@media (max-height: 900px) and (min-width: 700px) {
+    body:is(#loginPage, #registerPage) .auth-page { gap: 12px; padding-top: 16px; }
+    .auth-logo img { height: 58px; }
+    body:is(#loginPage, #registerPage) .auth-card { padding: 24px 30px 20px; }
+    body:is(#loginPage, #registerPage) .auth-form { gap: 12px; margin-top: 16px; }
+    body:is(#loginPage, #registerPage) .form-group input:not([type="checkbox"]) { height: 46px; }
+    body:is(#loginPage, #registerPage) .auth-card-header h2 { font-size: 34px; }
+    body:is(#loginPage, #registerPage) .auth-submit { height: 48px; }
+}
+@media (max-height: 900px) and (min-width: 700px) {
+    body#registerPage .auth-form { gap: 10px; margin-top: 14px; }
+    body#registerPage .form-group { gap: 4px; }
+    body#registerPage .form-group input:not([type="checkbox"]) { height: 42px; }
+    body#registerPage .auth-card { padding: 20px 30px 16px; }
+    body#registerPage .auth-card-header h2 { font-size: 30px; }
+    body#registerPage .auth-register { margin-top: 12px; }
+    body#registerPage .auth-guest { margin-top: 6px; }
+}
+
+/* login / register links: the line only appears on hover (it slides in), so the text sits evenly */
+body:is(#loginPage, #registerPage) :is(.auth-register a, .auth-guest a, .form-help-link) {
+    text-decoration: none !important;
+    color: #f2b33d;
+    padding-bottom: 3px;
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 2px;
+    transition: background-size .22s ease, color .2s ease;
+}
+body:is(#loginPage, #registerPage) :is(.auth-register a, .auth-guest a, .form-help-link):is(:hover, :focus-visible) {
+    background-size: 100% 2px;
+    color: #fff;
+}
+
+/* booking: courts that were not picked fade out; a short note when a date has no times left */
+.facility-choice.is-locked { opacity: .38 !important; cursor: not-allowed !important; filter: grayscale(1); }
+.facility-choice.is-locked:hover { border-color: inherit; }
+.past-note { margin: 14px 0 0; padding: 12px 14px; font-size: 14px; color: #8a5a00; background: #fdf0d3; border-left: 3px solid #e0a22a; }
+
+/* footer: one flat colour (no lighter left panel) */
+.footer-panel, .footer-panel::before { background: none; }
+
+/* arrow on the main forward buttons (Continue, Submit, Track, Log in, Create account, ...) */
+body:is(#bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage) :is(#bookingForm .btn-large.btn-dark, .btn-large.btn-dark:not(.btn-outline), .auth-submit, .fp-btn, .tracking-submit) {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+}
+body:is(#bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage) :is(.btn-large.btn-dark:not(.btn-outline), .auth-submit, .fp-btn, .tracking-submit)::after {
+    content: ""; flex: 0 0 auto; width: 1.1em; height: 1.1em; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='square'%3E%3Cpath d='M4 12h15M13 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='square'%3E%3Cpath d='M4 12h15M13 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform .2s ease;
+}
+body:is(#bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage) :is(.btn-large.btn-dark:not(.btn-outline), .auth-submit, .fp-btn, .tracking-submit):is(:hover, :focus-visible)::after { transform: translateX(5px); }
+body:is(#bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage) :is(.btn-large.btn-dark, .auth-submit, .fp-btn, .tracking-submit):disabled::after { opacity: .4; }
+
+/* one look for every primary button: sunset gradient, dark text, same hover as Home */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) :is(.btn-dark, .btn-primary, .btn-blue, .auth-submit, .fp-btn, .tracking-submit, .booking-form-actions .btn-dark, .qr-actions .btn-dark):not(.btn-outline),
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-form-actions .btn-dark:not(.btn-outline) {
+    background: var(--sunset); color: var(--deep); border-color: transparent; border-radius: 0;
+}
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) :is(.btn-dark, .btn-primary, .btn-blue, .auth-submit, .fp-btn, .tracking-submit, .booking-form-actions .btn-dark, .qr-actions .btn-dark):not(.btn-outline):hover,
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .booking-form-actions .btn-dark:not(.btn-outline):hover {
+    background: var(--sunset); color: var(--deep); border-color: transparent;
+}
+
+/* === CTA + FOOTER REDESIGN START (delete from here to END to go back) ===
+   one continuous dark ending: same colour top to bottom, stripes melt into the footer,
+   thin glowing line instead of a thick bar, MULTISPORT watermark, cleaner contact layout */
+body#homePage .cta-block {
+    background: #091d14;
+    padding-bottom: clamp(72px, 7vw, 112px);
+}
+body#homePage .cta-block::before {
+    inset: auto; right: -4%; top: 50%; left: auto; width: min(860px, 64vw); aspect-ratio: 4 / 3; opacity: 0.08;
+    transform: translateY(-50%) rotate(-7deg);
+    background: var(--hero-court-full) center / contain no-repeat;
+    -webkit-mask: none; mask: none;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer {
+    background: #091d14;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+/* hairline that glows in the middle and fades to the sides */
+/* divider line removed: CTA and footer read as one block */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer::before { display: none !important; }
+/* court markings behind the footer (same lines as the hero) */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -3%;
+    bottom: -22%;
+    width: min(760px, 56vw);
+    aspect-ratio: 4 / 3;
+    opacity: 0.08;
+    transform: rotate(-7deg);
+    background: var(--hero-court-half) center / contain no-repeat;
+    pointer-events: none;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-split {
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr);
+    align-items: start;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-panel { padding: 56px 40px 52px 0; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-info {
+    padding: 56px 0 52px 48px;
+    border-left: 1px solid rgba(255, 255, 255, .1);
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-info h4 {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 26px;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-info h4::after {
+    content: ""; flex: 1; height: 1px; background: rgba(255, 255, 255, .1);
+}
+/* each contact item: orange tick on the left */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item {
+    padding-left: 16px;
+    border-left: 3px solid #ef7435;
+}
+/* social icons: filled, no heavy outline */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a {
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(255, 255, 255, .1);
+    color: #fff;
+    transition: background .2s, color .2s, transform .2s, border-color .2s;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a:hover {
+    background: var(--sunset, linear-gradient(90deg, #ef7435, #f2b33d)); border-color: transparent; color: #091d14; transform: translateY(-3px);
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    padding-block: 22px 26px;
+    position: relative;
+}
+@media (max-width: 900px) {
+    body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-split { grid-template-columns: 1fr; }
+    body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-panel { padding: 40px 0 8px; }
+    body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-info { padding: 28px 0 36px; border-left: 0; }
+}
+/* contact icons instead of coloured ticks */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item { position: relative; padding: 2px 0 0 62px; border-left: 0; min-height: 46px; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item::before { content: ""; position: absolute; left: 0; top: 0; width: 44px; height: 44px; border: 1px solid rgba(239, 116, 53, .6); background: rgba(239, 116, 53, .08); }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item::after { content: ""; position: absolute; left: 11px; top: 11px; width: 22px; height: 22px; background: linear-gradient(135deg, #ef7435, #f2b33d); -webkit-mask: var(--fi-ic) center / contain no-repeat; mask: var(--fi-ic) center / contain no-repeat; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item:nth-child(1) { --fi-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z'/%3E%3C/svg%3E"); }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item:nth-child(2) { --fi-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='2'/%3E%3Cpath d='m22 7-10 6L2 7'/%3E%3C/svg%3E"); }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item:nth-child(3) { --fi-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E"); }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item:nth-child(4) { --fi-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E"); }
+
+/* ---- calmer lines: court lines only in the CTA (fading out), no vertical divider, no extra rules ---- */
+body#homePage .cta-block::before {
+    -webkit-mask: linear-gradient(180deg, #000 45%, transparent 100%) !important;
+            mask: linear-gradient(180deg, #000 45%, transparent 100%) !important;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer::after { display: none !important; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-info { border-left: 0 !important; padding-left: 0; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-info h4::after { display: none; }
+
+/* ---- footer bottom row: copyright left, Facilities + Track Booking centred, Privacy + Terms right ---- */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-bottom { display: grid !important; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px 28px; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-bottom > p { grid-column: 1; margin: 0; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-bottom-links { display: contents; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-links { grid-column: 2; justify-content: center; flex-wrap: nowrap; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-legal { grid-column: 3; justify-self: end; }
+@media (max-width: 900px) {
+    body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-bottom { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-bottom > p, body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-links, body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer .footer-legal { grid-column: 1; justify-self: center; }
+}
+/* ---- court lines in the footer of the inner pages (same lines as the Home CTA + footer) ---- */
+body:is(#facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer::after {
+    display: block !important;
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -7%;
+    top: -12%;
+    width: min(860px, 62vw);
+    aspect-ratio: 4 / 3;
+    opacity: 0.09;
+    transform: rotate(-5deg);
+    background: var(--hero-court-full) center / contain no-repeat;
+    -webkit-mask: linear-gradient(180deg, #000 78%, transparent 100%);
+            mask: linear-gradient(180deg, #000 78%, transparent 100%);
+    pointer-events: none;
+}
+/* ---- one icon style everywhere: square box, thin orange outline, orange icon, same size (40px) ---- */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item { padding: 0 0 0 56px; min-height: 40px; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item::before { width: 40px; height: 40px; box-sizing: border-box; border: 1px solid rgba(239, 116, 53, .6); background: rgba(239, 116, 53, .08); }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item::after { left: 10px; top: 10px; width: 20px; height: 20px; background: #f2893a; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fi-item small { margin-bottom: 2px; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a {
+    width: 40px; height: 40px; box-sizing: border-box; border: 1px solid rgba(239, 116, 53, .6); border-radius: 0;
+    background: rgba(239, 116, 53, .08); color: #f2893a;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a svg { width: 20px; height: 20px; stroke-width: 2; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .footer-social a:hover { background: #f2893a; border-color: #f2893a; color: #091d14; }
+/* === CTA + FOOTER REDESIGN END === */
+
+/* === NAV LINKS + HEADER EDGE START (delete from here to END to go back) ===
+   links: plain text, the current page is orange-to-amber gradient text; Log in shows its slanted box only on hover / click;
+   no orange line on the scrolled header */
+@media (min-width: 901px) {
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-link {
+    padding: 11px 18px;
+    background: none;
+    clip-path: none;
+    color: rgba(255, 255, 255, 0.72);
+    transition: color .2s ease;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-link::after { display: none; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-link:hover { background: none; color: #fff; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-link.active {
+    background: linear-gradient(90deg, #ef7435, #f2b33d);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .btn.btn-outline,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .acct-trigger:not([aria-expanded="true"]) {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    border-color: transparent;
+    transition: background-color .2s ease, color .2s ease;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .btn.btn-outline:hover,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .btn.btn-outline:focus-visible,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .acct-trigger:not([aria-expanded="true"]):hover,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .acct-trigger:not([aria-expanded="true"]):focus-visible {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-actions .btn.btn-outline:active {
+    background: linear-gradient(90deg, #ef7435, #f2b33d);
+    color: #0b2a1c;
+}
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header.scrolled,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage):has(main > .page-hero:first-child) .site-header.scrolled {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+/* === NAV LINKS + HEADER EDGE END === */
+
+/* === NO ALL-CAPS ON NAV + BUTTONS START (delete from here to END to go back) === */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .nav-link,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .btn,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) [class*="btn"],
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .abtn,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .acct-logout,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .acct-btn,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .fp-btn {
+    text-transform: none;
+    letter-spacing: 0.03em;
+}
+/* === NO ALL-CAPS ON NAV + BUTTONS END === */
+
+/* === LOGO INSIDE THE CARD START (login + register): centred, above the heading === */
+body:is(#loginPage, #registerPage) .auth-card > .auth-logo { display: flex; justify-content: center; margin: 0 0 14px; }
+body:is(#loginPage, #registerPage) .auth-card > .auth-logo img { height: 66px; width: auto; }
+@media (max-height: 900px) and (min-width: 700px) {
+    body:is(#loginPage, #registerPage) .auth-card > .auth-logo { margin-bottom: 10px; }
+    body:is(#loginPage, #registerPage) .auth-card > .auth-logo img { height: 54px; }
+}
+@media (max-width: 560px) {
+    body:is(#loginPage, #registerPage) .auth-card > .auth-logo img { height: 56px; }
+}
+/* === LOGO INSIDE THE CARD END === */
+
+/* === CENTRED LOGO START (delete from here to END to go back) ===
+   desktop only: Facilities | logo | Track Booking in the middle, Log in / account on the right, left end empty.
+   phones keep logo-left + menu button */
+@media (min-width: 901px) {
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .nav-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 10px;
+}
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .main-nav { display: contents; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .logo { grid-column: 3; grid-row: 1; justify-self: center; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .main-nav .nav-link:nth-child(1) { grid-column: 2; grid-row: 1; justify-self: end; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .main-nav .nav-link:nth-child(2) { grid-column: 4; grid-row: 1; justify-self: start; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .nav-actions { grid-column: 5; grid-row: 1; justify-self: end; }
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .logo .brand-logo-img { height: 60px; }
+}
+/* === CENTRED LOGO END === */
+
+/* === NAV TEXT NOT ITALIC START (delete from here to END to go back) === */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .nav-link,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .nav-actions .btn,
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header .nav-actions .acct-trigger {
+    font-style: normal;
+    letter-spacing: .04em;
+}
+/* === NAV TEXT NOT ITALIC END === */

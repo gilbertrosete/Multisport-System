@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Facility | MultiSport</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="description" content="Reserve a sports facility through the MultiSport reservation system.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Inner pages stylesheet (standalone: style.css is not used on this page) -->
+    <link rel="stylesheet" href="pages.css">
+    <link rel="stylesheet" href="nav-account.css">
+    <link rel="stylesheet" href="hero-bg.css">
+</head>
+
+<body id="bookingPage">
+
+<!-- NAVIGATION BAR -->
+<header class="site-header">
+    <div class="container nav-inner">
+
+        <a href="index.html" class="logo">
+            <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+        </a>
+
+        <nav class="main-nav" aria-label="Main">
+            <a href="facilities.html" class="nav-link">Facilities</a>
+            <a href="track-booking.html" class="nav-link">Track Booking</a>
+        </nav>
+
+        <!-- filled by script.js when logged in -->
+        <div class="nav-actions" id="userNavAction">
+            <a href="login.html" class="btn btn-outline">Log in</a>
+            <!-- <a href="register.html" class="btn btn-dark btn-primary">Create Account</a> -->
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-expanded="false">☰</button>
+    </div>
+</header>
+
+
+<main>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>
+                Reserve your
+                <span>sports facility.</span>
+            </h1>
+            <p>Choose a facility, select your preferred date and schedule, then continue with your booking.</p>
+        </div>
+    </section>
+
+
+    <!-- BOOKING -->
+    <section class="booking-page-section">
+        <div class="container">
+            <div class="booking-layout">
+
+                <!-- LEFT — FORM -->
+                <div class="booking-form-card">
+
+                    <div class="form-heading">
+                        <h2>Booking details</h2>
+                        <p>Select the facility and schedule you would like to reserve.</p>
+                    </div>
+
+                    <!-- 01 FACILITY -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span class="form-step-number">01</span>
+                            <div>
+                                <h3>Choose a facility</h3>
+                                <p>Select the sports facility you want to reserve.</p>
+                            </div>
+                        </div>
+
+                        <div class="facility-select-grid">
+                            <label class="facility-choice">
+                                <input type="radio" name="facility" value="basketball" onchange="updateLiveBookingSummary()">
+                                <div class="facility-choice-content">
+                                    <div class="choice-icon">🏀</div>
+                                    <div>
+                                        <strong>Basketball Court</strong>
+                                        <span>Indoor · Basketball</span>
+                                    </div>
+                                    <div class="choice-check">✓</div>
+                                </div>
+                            </label>
+
+                            <label class="facility-choice">
+                                <input type="radio" name="facility" value="volleyball" onchange="updateLiveBookingSummary()">
+                                <div class="facility-choice-content">
+                                    <div class="choice-icon">🏐</div>
+                                    <div>
+                                        <strong>Volleyball Court</strong>
+                                        <span>Indoor · Volleyball</span>
+                                    </div>
+                                    <div class="choice-check">✓</div>
+                                </div>
+                            </label>
+
+                            <label class="facility-choice">
+                                <input type="radio" name="facility" value="tennis" onchange="updateLiveBookingSummary()">
+                                <div class="facility-choice-content">
+                                    <div class="choice-icon">🎾</div>
+                                    <div>
+                                        <strong>Tennis Court</strong>
+                                        <span>Outdoor · Tennis</span>
+                                    </div>
+                                    <div class="choice-check">✓</div>
+                                </div>
+                            </label>
+
+                            <label class="facility-choice">
+                                <input type="radio" name="facility" value="badminton" onchange="updateLiveBookingSummary()">
+                                <div class="facility-choice-content">
+                                    <div class="choice-icon">🏸</div>
+                                    <div>
+                                        <strong>Badminton Court</strong>
+                                        <span>Indoor · Badminton</span>
+                                    </div>
+                                    <div class="choice-check">✓</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 02 DATE & TIME -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span class="form-step-number">02</span>
+                            <div>
+                                <h3>Select date &amp; schedule</h3>
+                                <p>Choose your preferred reservation date and time.</p>
+                            </div>
+                        </div>
+
+                        <div class="booking-fields-grid">
+                            <div class="booking-field">
+                                <label for="bookingDate">Reservation date</label>
+                                <input type="date" id="bookingDate" name="booking_date" onchange="updateLiveBookingSummary()" oninput="updateLiveBookingSummary()">
+                            </div>
+
+                            <div class="booking-field">
+                                <label for="bookingDuration">Duration</label>
+                                <select id="bookingDuration" name="duration" onchange="updateLiveBookingSummary()">
+                                    <option value="">Select duration</option>
+                                    <option value="1">1 hour</option>
+                                    <option value="2">2 hours</option>
+                                    <option value="3">3 hours</option>
+                                    <option value="4">4 hours</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <span class="schedule-label" id="timeSlotLabel">Preferred time</span>
+
+                        <div class="time-slot-grid" role="radiogroup" aria-labelledby="timeSlotLabel">
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="8:00 AM" onchange="updateLiveBookingSummary()">
+                                <span>8:00 AM</span>
+                            </label>
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="10:00 AM" onchange="updateLiveBookingSummary()">
+                                <span>10:00 AM</span>
+                            </label>
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="12:00 PM" onchange="updateLiveBookingSummary()">
+                                <span>12:00 PM</span>
+                            </label>
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="2:00 PM" onchange="updateLiveBookingSummary()">
+                                <span>2:00 PM</span>
+                            </label>
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="4:00 PM" onchange="updateLiveBookingSummary()">
+                                <span>4:00 PM</span>
+                            </label>
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="6:00 PM" onchange="updateLiveBookingSummary()">
+                                <span>6:00 PM</span>
+                            </label>
+                            <label class="time-slot">
+                                <input type="radio" name="time" value="8:00 PM" onchange="updateLiveBookingSummary()">
+                                <span>8:00 PM</span>
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <!-- ACTIONS -->
+                    <div class="booking-form-actions">
+                        <a href="facilities.html" class="text-link booking-back">Back to facilities</a>
+                        <a href="login.html" class="btn btn-dark btn-large" id="continueBookingBtn">Continue</a>
+                    </div>
+                    <p class="booking-account-note" id="bookingAccountNote">No account needed. Just enter your details on the next step. Already have one? <a href="login.html">Log in</a></p>
+                </div>
+
+                <!-- RIGHT — SUMMARY -->
+                <aside class="booking-summary-card">
+                    <div class="summary-top">
+                        <h2>Booking summary</h2>
+                        <p>Review your selected facility and schedule before continuing.</p>
+                    </div>
+
+                    <div class="summary-preview">
+                        <div class="summary-preview-image">
+                            <div class="summary-sport-icon">❓</div>
+                        </div>
+                        <div class="summary-preview-content">
+                            <span class="summary-label">Selected facility</span>
+                            <strong>Select a facility</strong>
+                            <span>No facility chosen</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-details">
+                        <div class="summary-detail">
+                            <span>Date</span>
+                            <strong id="summaryDate">Not selected</strong>
+                        </div>
+                        <div class="summary-detail">
+                            <span>Time</span>
+                            <strong id="summaryTime">Not selected</strong>
+                        </div>
+                        <div class="summary-detail">
+                            <span>Duration</span>
+                            <strong id="summaryDuration">Not selected</strong>
+                        </div>
+                        <div class="summary-detail summary-total">
+                            <span>Total price</span>
+                            <strong id="summaryTotal">—</strong>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+
+<!-- QR PAYMENT MODAL (opened by script.js) -->
+<div id="qrPaymentModal" class="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <div class="qr-card">
+        <div class="qr-head">
+            <h3 id="qrTitle">Scan to pay</h3>
+            <p>Scan the QR code below using your GCash or Maya app to pay the total amount.</p>
+        </div>
+
+        <div class="qr-body">
+            <div class="qr-code-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MultiSportPayment" alt="Payment QR code">
+            </div>
+
+            <div class="qr-total" id="modalTotalPriceDisplay">Total: ₱0.00</div>
+
+            <div class="qr-field">
+                <label for="modalRefNumberInput">GCash reference no.</label>
+                <input type="text" id="modalRefNumberInput" inputmode="numeric" autocomplete="off" maxlength="13" pattern="[0-9]{13}" placeholder="13-digit reference no.">
+                <small id="refHint" style="display:block;margin-top:6px;font-size:12px;color:#64748b;">Numbers only. You can find it on your GCash receipt (Ref No.).</small>
+            </div>
+
+            <div class="qr-field qr-proof">
+                <label for="modalProofInput">Payment screenshot</label>
+                <input type="file" id="modalProofInput" accept="image/png,image/jpeg,image/webp">
+                <small id="proofHint" style="display:block;margin-top:6px;font-size:12px;color:#64748b;">Upload a screenshot of your GCash receipt (JPG or PNG). The management uses it to confirm your payment.</small>
+                <img id="proofPreview" alt="Preview of your payment screenshot" hidden>
+            </div>
+
+            <div class="qr-actions">
+                <button type="button" class="btn btn-outline" id="cancelQrModalBtn">Cancel</button>
+                <button type="button" class="btn btn-dark" id="confirmQrPaymentBtn">Confirm payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container footer-split">
+
+        <div class="footer-panel">
+            <a href="index.html" class="logo">
+                <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+            </a>
+            <p>Court reservations at MetroGate Silang Estates.</p>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a>
+                <a href="#" aria-label="TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <h4>Contact</h4>
+            <div class="footer-info-grid">
+                <div class="fi-item"><small>Call us</small><a href="tel:+639123456789">+63 912 345 6789</a></div>
+                <div class="fi-item"><small>Email</small><a href="mailto:MoldexRealty@gmail.com">MoldexRealty@gmail.com</a></div>
+                <div class="fi-item"><small>Visit us</small><span>Aguinaldo Highway, Brgy. Biluso, Silang, Cavite</span></div>
+                <div class="fi-item"><small>Open daily</small><span>8:00 AM – 10:00 PM</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>&copy; 2026 Moldex Realty. All rights reserved.</p>
+        <div class="footer-bottom-links">
+            <div class="footer-links">
+                <a href="facilities.html">Facilities</a>
+                <a href="track-booking.html">Track Booking</a>
+            </div>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    /* Shows the price in the booking summary.
+       script.js already works out the total and keeps it in localStorage
+       (multisportFacilityRate / multisportTotalPrice); it just never
+       printed it on this page. We run right after its summary update. */
+    (function () {
+        var original = window.updateLiveBookingSummary;
+        if (typeof original !== 'function') return;
+
+        function paintTotal() {
+            var el = document.getElementById('summaryTotal');
+            if (!el) return;
+            var rate = parseFloat(localStorage.getItem('multisportFacilityRate'));
+            var duration = document.getElementById('bookingDuration');
+
+            if (!rate) {
+                el.textContent = '—';
+            } else if (!duration || !duration.value) {
+                el.textContent = '₱' + rate.toLocaleString() + '.00 / hour';
+            } else {
+                el.textContent = localStorage.getItem('multisportTotalPrice') || '—';
+            }
+        }
+
+        window.updateLiveBookingSummary = function () {
+            var result = original.apply(this, arguments);
+            paintTotal();
+            return result;
+        };
+
+        paintTotal();
+    })();
+</script>
+<script src="nav.js"></script>
+<script>
+/* Limits the Duration list so a booking cannot run past closing time (10:00 PM)
+   or into the next reservation already in the database (script.js fills
+   window._occupiedRanges for the chosen court and date). */
+(function () {
+    var CLOSING = 22;
+
+    function startHour(text) {
+        var m = /(\d{1,2}):\d{2}\s*(AM|PM)/i.exec(text || '');
+        if (!m) return null;
+        var h = parseInt(m[1], 10) % 12;
+        return m[2].toUpperCase() === 'PM' ? h + 12 : h;
+    }
+
+    function maxHours(start) {
+        var limit = CLOSING - start;
+        (window._occupiedRanges || []).forEach(function (r) {
+            if (r.start > start) limit = Math.min(limit, r.start - start);
+        });
+        return limit;
+    }
+
+    function limitDurations() {
+        var sel = document.getElementById('bookingDuration');
+        var picked = document.querySelector('input[name="time"]:checked');
+        if (!sel) return;
+        var start = picked ? startHour(picked.value) : null;
+        var max = start === null ? 99 : maxHours(start);
+        var reset = false;
+
+        Array.prototype.forEach.call(sel.options, function (opt) {
+            if (!opt.value) return;
+            var tooLong = parseInt(opt.value, 10) > max;
+            opt.disabled = tooLong;
+            opt.hidden = tooLong;
+            if (tooLong && opt.selected) reset = true;
+        });
+
+        if (reset) {
+            sel.value = '';
+            if (window.updateLiveBookingSummary) window.updateLiveBookingSummary();
+        }
+    }
+
+    document.addEventListener('change', function (e) {
+        if (!e.target) return;
+        if (e.target.name === 'time') limitDurations();
+        else if (e.target.name === 'facility' || e.target.id === 'bookingDate') {
+            setTimeout(limitDurations, 400);   /* booked hours are reloaded; the "occupied-ranges" event runs it again */
+        }
+    });
+    window.addEventListener('occupied-ranges', limitDurations);
+    document.addEventListener('DOMContentLoaded', function () { setTimeout(limitDurations, 600); });
+})();
+</script>
+<script src="hero-lines.js"></script>
+<script src="legal.js"></script>
+<script src="smooth.js"></script>
+</body>
+</html>

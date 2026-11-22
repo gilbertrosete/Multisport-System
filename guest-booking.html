@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Booking | MultiSport</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="description" content="Reserve a MultiSport facility without creating a customer account.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Inner pages stylesheet (standalone: style.css is not used on this page) -->
+    <link rel="stylesheet" href="pages.css">
+    <link rel="stylesheet" href="nav-account.css">
+    <link rel="stylesheet" href="hero-bg.css">
+
+    <!-- Guest details only make sense after a facility, date and time are chosen on the booking page.
+         Anyone arriving any other way (login link, footer, typed address, an old unfinished draft) goes to the booking page first. -->
+    <script>
+        (function () {
+            try {
+                var f = localStorage.getItem("multisportSelectedFacility");
+                var d = localStorage.getItem("multisportSelectedDate");
+                var t = localStorage.getItem("multisportSelectedTime");
+                var raw = localStorage.getItem("multisportRawDate");
+                var n = new Date();
+                var today = n.getFullYear() + "-" + ("0" + (n.getMonth() + 1)).slice(-2) + "-" + ("0" + n.getDate()).slice(-2);
+                var fromBooking = sessionStorage.getItem("msGuestFlow") === "1";
+                var missing = !fromBooking || !f || !d || d === "Not selected" || !t || t === "Not selected";
+                var past = raw && /^\d{4}-\d{2}-\d{2}$/.test(raw) && raw < today;
+                if (missing || past) window.location.replace("booking.html");
+            } catch (e) { /* storage blocked: leave the page as it is */ }
+        })();
+    </script>
+
+</head>
+
+<body id="guestBookingPage" class="guest-booking-page">
+
+<!-- NAVIGATION BAR -->
+<header class="site-header">
+    <div class="container nav-inner">
+
+        <a href="index.html" class="logo">
+            <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+        </a>
+
+        <nav class="main-nav" aria-label="Main">
+            <a href="facilities.html" class="nav-link">Facilities</a>
+            <a href="track-booking.html" class="nav-link">Track Booking</a>
+        </nav>
+
+        <!-- filled by script.js when logged in -->
+        <div class="nav-actions" id="userNavAction">
+            <a href="login.html" class="btn btn-outline">Log in</a>
+            <!-- <a href="register.html" class="btn btn-dark btn-primary">Create Account</a> -->
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-expanded="false">☰</button>
+    </div>
+</header>
+
+
+<main>
+
+    <!-- PAGE HERO -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>
+                Book without an
+                <span>account.</span>
+            </h1>
+            <p>You can reserve a MultiSport facility as a guest. Provide your contact details so the administrator can identify and manage your reservation.</p>
+        </div>
+    </section>
+
+
+    <!-- GUEST BOOKING
+         NOTE: this section uses "guest-page-section", not "booking-page-section".
+         script.js runs the facility-picker logic on every ".booking-page-section",
+         and on this page that logic erased the facility chosen on booking.html,
+         so every guest booking was saved as "Basketball Court". -->
+    <section class="guest-page-section">
+        <div class="container">
+            <div class="booking-layout">
+
+                <!-- LEFT — GUEST FORM -->
+                <div class="booking-form-card">
+
+                    <div class="form-heading">
+                        <h2>Guest information</h2>
+                        <p>Enter your information so the facility administrator can contact you about your reservation.</p>
+                    </div>
+
+                    <!-- 01 CONTACT -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span class="form-step-number">01</span>
+                            <div>
+                                <h3>Contact information</h3>
+                                <p>Please provide accurate details.</p>
+                            </div>
+                        </div>
+
+                        <div class="booking-fields-grid">
+                            <div class="booking-field">
+                                <label for="guestFirstName">First name</label>
+                                <input type="text" id="guestFirstName" name="first_name" placeholder="Enter your first name" autocomplete="given-name" required>
+                            </div>
+
+                            <div class="booking-field">
+                                <label for="guestLastName">Last name</label>
+                                <input type="text" id="guestLastName" name="last_name" placeholder="Enter your last name" autocomplete="family-name" required>
+                            </div>
+
+                            <div class="booking-field">
+                                <label for="guestEmail">Email address</label>
+                                <input type="email" id="guestEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
+                            </div>
+
+                            <div class="booking-field">
+                                <label for="guestPhone">Contact number</label>
+                                <input type="tel" id="guestPhone" name="phone" placeholder="09123456789" autocomplete="tel" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 02 ADDITIONAL -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <span class="form-step-number">02</span>
+                            <div>
+                                <h3>Additional information</h3>
+                                <p>Provide the information required for reservation identification.</p>
+                            </div>
+                        </div>
+
+                        <div class="booking-fields-grid">
+                            <div class="booking-field" style="grid-column: 1 / -1;">
+                                <label for="guestAddress">Address</label>
+                                <input type="text" id="guestAddress" name="address" placeholder="Enter your address" autocomplete="street-address" required>
+                            </div>
+
+                            <div class="booking-field" style="grid-column: 1 / -1;">
+                                <label for="guestPurpose">Purpose of reservation</label>
+                                <select id="guestPurpose" name="purpose" required>
+                                    <option value="">Select purpose</option>
+                                    <option value="recreational">Recreational activity</option>
+                                    <option value="training">Training / Practice</option>
+                                    <option value="competition">Competition / Tournament</option>
+                                    <option value="community">Community activity</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NOTE -->
+                    <div class="schedule-note">
+                        <span class="schedule-note-icon">i</span>
+                        <p>After you submit, the system generates a booking reference that you can use to track your reservation status.</p>
+                    </div>
+
+                    <!-- AGREEMENT -->
+                    <div class="guest-agreement">
+                        <label class="agreement-check">
+                            <input type="checkbox" id="guestAgreement" name="agreement" required>
+                            <span>I confirm that the information I provided is accurate and may be used for processing and managing my reservation.</span>
+                        </label>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="booking-form-actions">
+                        <a href="booking.html" class="btn btn-outline btn-large">Back</a>
+                        <button type="button" class="btn btn-dark btn-large" id="submitGuestBooking">Submit reservation</button>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT — SUMMARY -->
+                <aside class="booking-summary-card guest-booking-side">
+                    <div class="summary-top">
+                        <h2>Reservation details</h2>
+                        <p>You are continuing without a customer account.</p>
+                    </div>
+
+                    <div class="summary-preview">
+                        <div class="summary-preview-image">
+                            <div class="summary-sport-icon" id="guestSportIcon">🏀</div>
+                        </div>
+                        <div class="summary-preview-content">
+                            <span class="summary-label">Selected facility</span>
+                            <strong id="guestFacilityName">Basketball Court</strong>
+                            <span id="guestScheduleText">Schedule required</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-details">
+                        <div class="summary-detail">
+                            <span>Date</span>
+                            <strong id="summaryDate">Not selected</strong>
+                        </div>
+                        <div class="summary-detail">
+                            <span>Time</span>
+                            <strong id="summaryTime">Not selected</strong>
+                        </div>
+                        <div class="summary-detail">
+                            <span>Customer</span>
+                            <strong id="guestSummaryName">Not provided</strong>
+                        </div>
+                        <div class="summary-detail">
+                            <span>Contact</span>
+                            <strong id="guestSummaryContact">Not provided</strong>
+                        </div>
+                        <div class="summary-detail">
+                            <span>Booking status</span>
+                            <strong>Pending confirmation</strong>
+                        </div>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-notice">
+                        <div class="notice-icon">✓</div>
+                        <div>
+                            <strong>Guest reservations are recorded</strong>
+                            <p>Your details are attached to the reservation so the administrator can review and manage your booking.</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-footer">
+                        <span>Already have an account?</span>
+                        <a href="login.html">Log in instead</a>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- INFORMATION -->
+    <section class="auth-information">
+        <div class="container">
+            <div class="auth-info-grid">
+                <div class="auth-info-item">
+                    <div>
+                        <h3>No account required</h3>
+                        <p>You can make a reservation without registering for a customer account.</p>
+                    </div>
+                </div>
+
+                <div class="auth-info-item">
+                    <div>
+                        <h3>Your details are recorded</h3>
+                        <p>Contact information helps the administrator identify your reservation.</p>
+                    </div>
+                </div>
+
+                <div class="auth-info-item">
+                    <div>
+                        <h3>Track your reservation</h3>
+                        <p>Keep your booking reference so you can check your reservation status later.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+
+<!-- QR PAYMENT MODAL (opened by script.js) -->
+<div id="qrPaymentModal" class="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <div class="qr-card">
+        <div class="qr-head">
+            <h3 id="qrTitle">Scan to pay</h3>
+            <p>Scan the QR code below using your GCash or Maya app to pay the total amount.</p>
+        </div>
+
+        <div class="qr-body">
+            <div class="qr-code-box">
+                <img src="qrcode.png" alt="Payment QR code" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'180\' height=\'180\' viewBox=\'0 0 180 180\'><rect width=\'180\' height=\'180\' fill=\'%23f0f0f0\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\' fill=\'%23666666\'>QR Code Image</text></svg>';">
+            </div>
+
+            <div class="qr-total" id="modalTotalPriceDisplay">Total: ₱0.00</div>
+
+            <div class="qr-field">
+                <label for="modalRefNumberInput">GCash reference no.</label>
+                <input type="text" id="modalRefNumberInput" inputmode="numeric" autocomplete="off" maxlength="13" pattern="[0-9]{13}" placeholder="13-digit reference no.">
+                <small id="refHint" style="display:block;margin-top:6px;font-size:12px;color:#64748b;">Numbers only. You can find it on your GCash receipt (Ref No.).</small>
+            </div>
+
+            <div class="qr-field qr-proof">
+                <label for="modalProofInput">Payment screenshot</label>
+                <input type="file" id="modalProofInput" accept="image/png,image/jpeg,image/webp">
+                <small id="proofHint" style="display:block;margin-top:6px;font-size:12px;color:#64748b;">Upload a screenshot of your GCash receipt (JPG or PNG). The management uses it to confirm your payment.</small>
+                <img id="proofPreview" alt="Preview of your payment screenshot" hidden>
+            </div>
+
+            <div class="qr-actions">
+                <button type="button" class="btn btn-outline" id="cancelQrModalBtn">Cancel</button>
+                <button type="button" class="btn btn-dark" id="confirmQrPaymentBtn">Confirm payment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container footer-split">
+
+        <div class="footer-panel">
+            <a href="index.html" class="logo">
+                <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+            </a>
+            <p>Court reservations at MetroGate Silang Estates.</p>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a>
+                <a href="#" aria-label="TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <h4>Contact</h4>
+            <div class="footer-info-grid">
+                <div class="fi-item"><small>Call us</small><a href="tel:+639123456789">+63 912 345 6789</a></div>
+                <div class="fi-item"><small>Email</small><a href="mailto:MoldexRealty@gmail.com">MoldexRealty@gmail.com</a></div>
+                <div class="fi-item"><small>Visit us</small><span>Aguinaldo Highway, Brgy. Biluso, Silang, Cavite</span></div>
+                <div class="fi-item"><small>Open daily</small><span>8:00 AM – 10:00 PM</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>&copy; 2026 Moldex Realty. All rights reserved.</p>
+        <div class="footer-bottom-links">
+            <div class="footer-links">
+                <a href="facilities.html">Facilities</a>
+                <a href="track-booking.html">Track Booking</a>
+            </div>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="nav.js"></script>
+<script src="hero-lines.js"></script>
+<script src="legal.js"></script>
+<script src="smooth.js"></script>
+</body>
+</html>

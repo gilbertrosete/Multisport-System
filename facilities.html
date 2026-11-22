@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facilities | MultiSport</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="description" content="Browse basketball, volleyball, tennis and badminton courts available for reservation.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Inner pages stylesheet (standalone: style.css is not used on this page) -->
+    <link rel="stylesheet" href="pages.css">
+    <link rel="stylesheet" href="nav-account.css">
+    <link rel="stylesheet" href="hero-bg.css">
+</head>
+
+<body id="facilitiesPage">
+
+<!-- NAVIGATION BAR -->
+<header class="site-header">
+    <div class="container nav-inner">
+
+        <a href="index.html" class="logo">
+            <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+        </a>
+
+        <nav class="main-nav" aria-label="Main">
+            <a href="facilities.html" class="nav-link active">Facilities</a>
+            <a href="track-booking.html" class="nav-link">Track Booking</a>
+        </nav>
+
+        <!-- filled by script.js when logged in -->
+        <div class="nav-actions" id="userNavAction">
+            <a href="login.html" class="btn btn-outline">Log in</a>
+            <!-- <a href="register.html" class="btn btn-dark btn-primary">Create Account</a> -->
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-expanded="false">☰</button>
+    </div>
+</header>
+
+
+<main>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+    <div class="container">
+        <h1>
+            Choose your court
+            <span>and play.</span>
+        </h1>
+        <p>Explore our sports facilities, built for casual games, team practices, and competitive matches.</p>
+    </div>
+</section>
+
+
+<!-- FACILITIES -->
+<section class="facility-browser">
+    <div class="container">
+        <div class="facility-grid">
+
+            <!-- BASKETBALL -->
+            <article class="card facility-item">
+                <div class="facility-image" role="button" tabindex="0" aria-label="View larger photo of the basketball court" onclick="openImageModal('img/indoor-basketball-court.webp', 'Basketball Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/indoor-basketball-court.webp" alt="" loading="lazy" style="object-position:62% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+                <div class="facility-content">
+                    <span class="facility-category">Basketball</span>
+                    <h3>Basketball Court</h3>
+                    <p>A spacious indoor court suitable for full-court games, shooting practices, and recreational play.</p>
+                    <div class="facility-info-row">
+                        <span>Indoor</span>
+                        <span>Full Court</span>
+                        <span>Lighting</span>
+                    </div>
+                    <div class="facility-bottom">
+                        <span class="facility-price">
+                            <span class="price-label">Starting from</span>
+                            <strong>₱500</strong>
+                            <span class="price-unit">/ slot</span>
+                        </span>
+                        <a href="booking.html?facility=basketball">Book</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- VOLLEYBALL -->
+            <article class="card facility-item">
+                <div class="facility-image" role="button" tabindex="0" aria-label="View larger photo of the volleyball court" onclick="openImageModal('img/volleyball-indoor-court.jpg', 'Volleyball Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/volleyball-indoor-court.jpg" alt="" loading="lazy" style="object-position:55% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+                <div class="facility-content">
+                    <span class="facility-category">Volleyball</span>
+                    <h3>Volleyball Court</h3>
+                    <p>Standard indoor volleyball court equipped with regulation net and boundary markings.</p>
+                    <div class="facility-info-row">
+                        <span>Indoor</span>
+                        <span>Standard Net</span>
+                        <span>Seating</span>
+                    </div>
+                    <div class="facility-bottom">
+                        <span class="facility-price">
+                            <span class="price-label">Starting from</span>
+                            <strong>₱500</strong>
+                            <span class="price-unit">/ slot</span>
+                        </span>
+                        <a href="booking.html?facility=volleyball">Book</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TENNIS -->
+            <article class="card facility-item">
+                <div class="facility-image" role="button" tabindex="0" aria-label="View larger photo of the tennis court" onclick="openImageModal('img/tennis-court-silang.jpg', 'Tennis Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/tennis-court-silang.jpg" alt="" loading="lazy" style="object-position:50% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+                <div class="facility-content">
+                    <span class="facility-category">Tennis</span>
+                    <h3>Tennis Court</h3>
+                    <p>Outdoor hard court facility designed for singles or doubles tennis matches.</p>
+                    <div class="facility-info-row">
+                        <span>Outdoor</span>
+                        <span>Hard Court</span>
+                        <span>Fenced</span>
+                    </div>
+                    <div class="facility-bottom">
+                        <span class="facility-price">
+                            <span class="price-label">Starting from</span>
+                            <strong>₱500</strong>
+                            <span class="price-unit">/ slot</span>
+                        </span>
+                        <a href="booking.html?facility=tennis">Book</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- BADMINTON -->
+            <article class="card facility-item">
+                <div class="facility-image" role="button" tabindex="0" aria-label="View larger photo of the badminton court" onclick="openImageModal('img/badminton-court-indoor.jpg', 'Badminton Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/badminton-court-indoor.jpg" alt="" loading="lazy" style="object-position:50% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+                <div class="facility-content">
+                    <span class="facility-category">Badminton</span>
+                    <h3>Badminton Court</h3>
+                    <p>Indoor badminton court with proper flooring and net setup for casual or match play.</p>
+                    <div class="facility-info-row">
+                        <span>Indoor</span>
+                        <span>Singles / Doubles</span>
+                        <span>Ventilated</span>
+                    </div>
+                    <div class="facility-bottom">
+                        <span class="facility-price">
+                            <span class="price-label">Starting from</span>
+                            <strong>₱300</strong>
+                            <span class="price-unit">/ slot</span>
+                        </span>
+                        <a href="booking.html?facility=badminton">Book</a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<!-- COMING SOON (preview only: cannot be booked yet) -->
+<section class="soon-section" aria-labelledby="soonTitle">
+    <div class="container">
+        <div class="soon-head">
+            <span class="soon-eyebrow">Coming soon</span>
+            <h2 id="soonTitle">More sports are on the way</h2>
+            <p>We are adding more facilities at MetroGate. These cannot be booked yet. Rates will be posted here once they are ready.</p>
+        </div>
+
+        <div class="facility-grid">
+
+            <!-- SOCCER -->
+            <article class="card facility-item is-soon">
+                <div class="facility-image">
+                    <img src="img/soccer-field-silang.jpg" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span class="facility-status soon-badge">Coming soon</span>
+                </div>
+                <div class="facility-content">
+                    <span class="facility-category">Soccer</span>
+                    <h3>Soccer Field</h3>
+                    <p>A soccer field is being prepared at MetroGate Silang Estates. Details and rates will be shared soon.</p>
+                    <div class="facility-bottom">
+                        <span class="facility-price">
+                            <span class="price-label">Rate</span>
+                            <strong>To be announced</strong>
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- GOLF -->
+            <article class="card facility-item is-soon">
+                <div class="facility-image">
+                    <img src="img/court-golf.webp" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span class="facility-status soon-badge">Coming soon</span>
+                </div>
+                <div class="facility-content">
+                    <span class="facility-category">Golf</span>
+                    <h3>Golf</h3>
+                    <p>Golf is coming to MetroGate Silang Estates. Details and rates will be shared soon.</p>
+                    <div class="facility-bottom">
+                        <span class="facility-price">
+                            <span class="price-label">Rate</span>
+                            <strong>To be announced</strong>
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+</main>
+
+
+<!-- IMAGE LIGHTBOX MODAL -->
+<div id="imageLightboxModal" class="adv-modal-overlay" onclick="closeImageModal()">
+    <div class="adv-modal-content" onclick="event.stopPropagation()">
+        <button class="adv-modal-close" onclick="closeImageModal()" aria-label="Close photo">✕</button>
+        <img id="lightboxImage" src="" alt="Enlarged Court View">
+        <h4 id="lightboxTitle">Court Preview</h4>
+    </div>
+</div>
+
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container footer-split">
+
+        <div class="footer-panel">
+            <a href="index.html" class="logo">
+                <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+            </a>
+            <p>Court reservations at MetroGate Silang Estates.</p>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a>
+                <a href="#" aria-label="TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <h4>Contact</h4>
+            <div class="footer-info-grid">
+                <div class="fi-item"><small>Call us</small><a href="tel:+639123456789">+63 912 345 6789</a></div>
+                <div class="fi-item"><small>Email</small><a href="mailto:MoldexRealty@gmail.com">MoldexRealty@gmail.com</a></div>
+                <div class="fi-item"><small>Visit us</small><span>Aguinaldo Highway, Brgy. Biluso, Silang, Cavite</span></div>
+                <div class="fi-item"><small>Open daily</small><span>8:00 AM – 10:00 PM</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>&copy; 2026 Moldex Realty. All rights reserved.</p>
+        <div class="footer-bottom-links">
+            <div class="footer-links">
+                <a href="facilities.html">Facilities</a>
+                <a href="track-booking.html">Track Booking</a>
+            </div>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="nav.js"></script>
+<script src="hero-lines.js"></script>
+<script src="legal.js"></script>
+<script src="smooth.js"></script>
+</body>
+</html>

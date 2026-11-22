@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiSport | Sports Facility Reservation</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="description" content="Reserve basketball, volleyball, tennis and badminton courts online.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Home page stylesheet (standalone: style.css is not used on this page) -->
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="nav-account.css">
+    <link rel="stylesheet" href="hero-bg.css">
+</head>
+
+<body id="homePage">
+
+<!-- NAVIGATION BAR -->
+<header class="navbar site-header">
+    <div class="container nav-wrapper nav-inner">
+
+        <!-- LOGO -->
+        <a href="index.html" class="logo">
+            <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+        </a>
+
+        <!-- NAVIGATION LINKS -->
+        <nav class="main-nav nav-links">
+            <a href="facilities.html" class="nav-link">Facilities</a>
+            <a href="track-booking.html" class="nav-link">Track Booking</a>
+        </nav>
+
+        <!-- NAVIGATION ACTIONS & PROFILE DROPDOWN (filled by script.js when logged in) -->
+        <div class="nav-actions" id="userNavAction">
+            <a href="login.html" class="btn btn-outline">Log in</a>
+            <!-- <a href="register.html" class="btn btn-dark btn-primary">Create Account</a> -->
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation" aria-expanded="false">☰</button>
+    </div>
+</header>
+
+
+<main>
+
+<!-- HERO SECTION -->
+<section class="hero page-hero">
+    <div class="container hero-grid">
+
+        <div class="hero-content">
+            <span class="eyebrow eyebrow-light">MetroGate Silang Estates</span>
+
+            <h1>
+                Book a court.
+                <br>
+                <span>Play more.</span>
+            </h1>
+
+            <p class="hero-copy">
+                Everything you need to get on court, in one place.
+            </p>
+
+            <div class="hero-actions">
+                <a href="booking.html" class="btn btn-primary btn-large btn-dark">
+                    Book a Court
+                </a>
+            </div>
+
+            <ul class="hero-notes">
+                <li>
+                    <span class="check-icon" aria-hidden="true">&#10003;</span>
+                    <span>Guests welcome. No sign-up needed.</span>
+                </li>
+                <li>
+                    <span class="check-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    </span>
+                    <span>Open every day, 8:00 AM to 10:00 PM</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="hero-ball3d" id="heroBall3d">
+            <canvas aria-label="3D basketball, volleyball, tennis ball and shuttlecock. Hover one to spin it, click to bounce." tabindex="0"></canvas>
+        </div>
+    </div>
+</section>
+
+
+<!-- QUICK BOOKING / SLOT SEARCH -->
+<section class="quick-booking">
+    <div class="container">
+        <div class="quick-booking-card">
+            <div class="quick-title">
+                <span class="eyebrow eyebrow-light">Next available</span>
+                <h2 id="nextCourt">All courts</h2>
+                <p class="quick-next" id="nextTime">Checking times&hellip;</p>
+            </div>
+
+            <div class="quick-fields">
+                <div class="quick-field">
+                    <label for="homeSportSelect">Pick a sport to see open days</label>
+                    <select id="homeSportSelect">
+                        <option value="pick" selected>Choose a sport</option>
+                        <option value="">All courts</option>
+                        <option value="basketball">Basketball</option>
+                        <option value="volleyball">Volleyball</option>
+                        <option value="tennis">Tennis</option>
+                        <option value="badminton">Badminton</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- AVAILABILITY CALENDAR (filled by avail.js) -->
+        <div class="avail" id="availPanel" aria-live="polite">
+            <div class="avail-head">
+                <div>
+                    <h3>Pick a day</h3>
+                    <p>Green means open times, yellow means almost full, red means fully booked.</p>
+                </div>
+                <div class="avail-chips" id="availChips" role="group" aria-label="Filter by court"></div>
+                <button type="button" class="avail-close" id="availClose" aria-label="Close calendar" title="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
+            <div class="avail-body">
+                <div class="avail-cal">
+                    <div class="avail-month">
+                        <button type="button" class="avail-nav" id="availPrev" aria-label="Previous month">‹</button>
+                        <strong id="availMonthLabel">Loading…</strong>
+                        <button type="button" class="avail-nav" id="availNext" aria-label="Next month">›</button>
+                    </div>
+                    <div class="avail-week"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+                    <div class="avail-grid" id="availGrid"></div>
+                    <div class="avail-legend" id="availLegend"></div>
+                </div>
+                <div class="avail-day" id="availDay"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- FACILITIES -->
+<section class="section facilities-section">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">The courts</span>
+                <h2>Choose your <em>court.</em></h2>
+                <p>Explore the available sports facilities and find a schedule that works for you.</p>
+            </div>
+        </div>
+
+        <div class="grid-4">
+
+            <!-- BASKETBALL -->
+            <article class="card facility-card">
+                <div class="facility-img" role="button" tabindex="0" aria-label="View larger photo of the basketball court" onclick="openImageModal('img/indoor-basketball-court.webp', 'Basketball Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/indoor-basketball-court.webp" alt="" loading="lazy" style="object-position:62% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+
+                <div class="facility-body">
+                    <span class="tag">Basketball</span>
+                    <h3>Basketball Court</h3>
+                    <p>A spacious court suitable for games, practices, and recreational play.</p>
+
+                    <div class="facility-meta">
+                        <div>
+                            <span class="price-label">Starting from</span>
+                            <strong class="price">₱500</strong>
+                            <span class="price-unit">/ slot</span>
+                        </div>
+                        <a href="booking.html?facility=basketball" class="btn btn-soft btn-dark">Book</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- VOLLEYBALL -->
+            <article class="card facility-card">
+                <div class="facility-img" role="button" tabindex="0" aria-label="View larger photo of the volleyball court" onclick="openImageModal('img/volleyball-indoor-court.jpg', 'Volleyball Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/volleyball-indoor-court.jpg" alt="" loading="lazy" style="object-position:55% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+
+                <div class="facility-body">
+                    <span class="tag">Volleyball</span>
+                    <h3>Volleyball Court</h3>
+                    <p>Reserve a court for friendly games, training, and organized activities.</p>
+
+                    <div class="facility-meta">
+                        <div>
+                            <span class="price-label">Starting from</span>
+                            <strong class="price">₱500</strong>
+                            <span class="price-unit">/ slot</span>
+                        </div>
+                        <a href="booking.html?facility=volleyball" class="btn btn-soft btn-dark">Book</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TENNIS -->
+            <article class="card facility-card">
+                <div class="facility-img" role="button" tabindex="0" aria-label="View larger photo of the tennis court" onclick="openImageModal('img/tennis-court-silang.jpg', 'Tennis Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/tennis-court-silang.jpg" alt="" loading="lazy" style="object-position:50% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+
+                <div class="facility-body">
+                    <span class="tag">Tennis</span>
+                    <h3>Tennis Court</h3>
+                    <p>A dedicated court for tennis sessions and recreational activities.</p>
+
+                    <div class="facility-meta">
+                        <div>
+                            <span class="price-label">Starting from</span>
+                            <strong class="price">₱500</strong>
+                            <span class="price-unit">/ slot</span>
+                        </div>
+                        <a href="booking.html?facility=tennis" class="btn btn-soft btn-dark">Book</a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- BADMINTON -->
+            <article class="card facility-card">
+                <div class="facility-img" role="button" tabindex="0" aria-label="View larger photo of the badminton court" onclick="openImageModal('img/badminton-court-indoor.jpg', 'Badminton Court')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+                    <img src="img/badminton-court-indoor.jpg" alt="" loading="lazy" style="object-position:50% 50%">
+                    <span class="facility-status">Available</span>
+                </div>
+
+                <div class="facility-body">
+                    <span class="tag">Badminton</span>
+                    <h3>Badminton Court</h3>
+                    <p>Indoor court reservation for casual games and practice sessions.</p>
+
+                    <div class="facility-meta">
+                        <div>
+                            <span class="price-label">Starting from</span>
+                            <strong class="price">₱300</strong>
+                            <span class="price-unit">/ slot</span>
+                        </div>
+                        <a href="booking.html?facility=badminton" class="btn btn-soft btn-dark">Book</a>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how-it-works">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow eyebrow-light">How it works</span>
+                <h2>From court to <em>confirmed.</em></h2>
+                <p>Four steps, and you can book as a guest or with your account.</p>
+            </div>
+        </div>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-num">1</span>
+                <h3>Choose a court</h3>
+                <p>Pick from basketball, volleyball, tennis, and badminton facilities.</p>
+            </li>
+            <li class="step">
+                <span class="step-num">2</span>
+                <h3>Set your schedule</h3>
+                <p>Select the date and the time slot that works for you.</p>
+            </li>
+            <li class="step">
+                <span class="step-num">3</span>
+                <h3>Reserve your slot</h3>
+                <p>Book as a guest or log in. No account is needed for guests.</p>
+            </li>
+            <li class="step">
+                <span class="step-num">4</span>
+                <h3>Track your booking</h3>
+                <p>Check the status of your reservation anytime on the Track Booking page.</p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<!-- LOCATION -->
+<section class="section location-section" id="location">
+    <div class="container">
+        <div class="section-head loc-head">
+            <div>
+                <span class="eyebrow">Location</span>
+                <h2>Find the <em>courts.</em></h2>
+                <p>Inside MetroGate Silang Estates by Moldex Realty, along Aguinaldo Highway.</p>
+            </div>
+        </div>
+
+        <div class="loc-wrap">
+        <div class="loc-card">
+            <div class="loc-info">
+                <span class="loc-eyebrow">Visit us</span>
+                <h3>MetroGate Silang Estates</h3>
+
+                <ul class="loc-facts">
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>Aguinaldo Highway, Brgy. Biluso, Silang, Cavite</span>
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <span>Open daily<br>8:00 AM &ndash; 10:00 PM</span>
+                    </li>
+                </ul>
+
+                <div class="loc-actions">
+                    <a class="btn btn-primary loc-btn" target="_blank" rel="noopener"
+                       href="https://www.google.com/maps/search/?api=1&query=MetroGate+Silang+Estates+by+Moldex+Realty">
+                        Get Directions
+                    </a>
+                </div>
+            </div>
+
+            <div class="loc-map">
+                <iframe class="loc-frame" title="Map showing MetroGate Silang Estates by Moldex Realty"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3867.218854139499!2d120.9713903759002!3d14.24045168579099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd7f5edc249275%3A0x44cf3a840e5767be!2sMetroGate%20Silang%20Estates%20by%20Moldex%20Realty!5e0!3m2!1sen!2sph!4v1793601927691!5m2!1sen!2sph"
+                    style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section class="cta-block" aria-labelledby="ctaTitle">
+    <div class="container">
+        <div class="cta">
+            <div>
+                <h2 id="ctaTitle">Reserve your next <em>game.</em></h2>
+                <p>Choose your facility and find a schedule that works for you.</p>
+            </div>
+
+            <div class="hero-actions">
+                <a href="booking.html" class="btn btn-primary btn-large btn-dark">
+                    Book Now
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+
+<!-- IMAGE LIGHTBOX MODAL -->
+<div id="imageLightboxModal" class="adv-modal-overlay" onclick="closeImageModal()">
+    <div class="adv-modal-content" onclick="event.stopPropagation()">
+        <button class="adv-modal-close" onclick="closeImageModal()" aria-label="Close photo">✕</button>
+        <img id="lightboxImage" src="" alt="Enlarged Court View">
+        <h4 id="lightboxTitle">Court Preview</h4>
+    </div>
+</div>
+
+<!-- SCHEDULE MODAL (filled by script.js when "Search Slot" is pressed) -->
+<div id="scheduleModal" class="adv-modal-overlay" onclick="closeScheduleModal()">
+    <div class="adv-modal-content schedule-modal" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="modalScheduleTitle">
+        <button class="adv-modal-close" onclick="closeScheduleModal()" aria-label="Close schedule">✕</button>
+        <h4 id="modalScheduleTitle">Court Schedule</h4>
+        <p id="modalScheduleSub" class="schedule-sub"></p>
+        <div id="scheduleSlotsContainer" class="schedule-slots"></div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+
+    <div class="container footer-split">
+
+        <div class="footer-panel">
+            <a href="index.html" class="logo">
+                <img src="img/logo-moldex-realty.png" alt="Moldex Realty" class="brand-logo-img">
+            </a>
+            <p>Court reservations at MetroGate Silang Estates.</p>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg></a>
+                <a href="#" aria-label="TikTok" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <h4>Contact</h4>
+            <div class="footer-info-grid">
+                <div class="fi-item"><small>Call us</small><a href="tel:+639123456789">+63 912 345 6789</a></div>
+                <div class="fi-item"><small>Email</small><a href="mailto:MoldexRealty@gmail.com">MoldexRealty@gmail.com</a></div>
+                <div class="fi-item"><small>Visit us</small><a href="#location">Aguinaldo Highway, Brgy. Biluso, Silang, Cavite</a></div>
+                <div class="fi-item"><small>Open daily</small><span>8:00 AM – 10:00 PM</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>&copy; 2026 Moldex Realty. All rights reserved.</p>
+        <div class="footer-bottom-links">
+            <div class="footer-links">
+                <a href="facilities.html">Facilities</a>
+                <a href="track-booking.html">Track Booking</a>
+            </div>
+            <div class="footer-legal">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="avail.js"></script>
+<script>
+/* Already on Home: the logo just scrolls back to the top instead of reloading the page. */
+document.querySelectorAll('a.logo[href="index.html"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        if (location.hash) history.replaceState(null, '', location.pathname);
+    });
+});
+</script>
+<script>
+/* Home page extras: script.js has no handler for the mobile menu button.
+   If you later add one to script.js, remove this block to avoid double toggling. */
+(function () {
+    var btn = document.getElementById('mobileMenuBtn');
+    var nav = document.querySelector('.main-nav');
+    var actions = document.getElementById('userNavAction');
+
+    function setOpen(open) {
+        nav.classList.toggle('mobile-open', open);
+        actions.classList.toggle('mobile-open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.textContent = open ? '\u2715' : '\u2630';
+    }
+
+    if (btn && nav && actions) {
+        btn.addEventListener('click', function () {
+            setOpen(!nav.classList.contains('mobile-open'));
+        });
+        nav.addEventListener('click', function (e) {
+            if (e.target.closest('a')) setOpen(false);
+        });
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (window.closeImageModal) window.closeImageModal();
+        if (window.closeScheduleModal) window.closeScheduleModal();
+    });
+})();
+</script>
+<script>
+    /* gentle fade-up as sections come into view (skipped for reduced motion) */
+    (function () {
+        if (!("IntersectionObserver" in window)) return;
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var items = document.querySelectorAll(".section-head, .grid-4 .facility-card, .steps .step, .loc-wrap, .cta-block .cta");
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+        items.forEach(function (el, i) {
+            el.classList.add("rv");
+            el.style.transitionDelay = ((i % 4) * 90) + "ms";
+            io.observe(el);
+        });
+    })();
+</script>
+<script>
+/* keeps the booking bar centred on the hero's bottom edge (reads the bar height into --qbh) */
+(function () {
+    var bar = document.querySelector('.quick-booking-card');
+    var wrap = document.querySelector('.quick-booking');
+    if (!bar || !wrap) return;
+    function set() { wrap.style.setProperty('--qbh', Math.round(bar.getBoundingClientRect().height) + 'px'); document.body.style.setProperty('--qbh', Math.round(bar.getBoundingClientRect().height) + 'px'); }
+    set();
+    if (window.ResizeObserver) new ResizeObserver(set).observe(bar);
+    window.addEventListener('resize', set);
+})();
+</script>
+<script src="hero-lines.js"></script>
+<script src="hero-next.js"></script>
+<script src="hero-ball3d.js"></script>
+<script src="legal.js"></script>
+<script src="smooth.js"></script>
+</body>
+</html>

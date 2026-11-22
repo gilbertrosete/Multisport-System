@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | MultiSport</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="description" content="Login to your MultiSport customer account.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,600;1,700;1,800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Inner pages stylesheet (standalone: style.css is not used on this page) -->
+    <link rel="stylesheet" href="pages.css">
+    <link rel="stylesheet" href="nav-account.css">
+    <link rel="stylesheet" href="hero-bg.css">
+</head>
+
+<body id="loginPage">
+
+<main>
+
+    <section class="auth-page">
+        <div class="container">
+            <div class="auth-layout">
+
+                <!-- RIGHT — FORM -->
+                <div class="auth-card">
+                    <a href="index.html" class="auth-logo" aria-label="Moldex Realty home">
+                        <img src="img/logo-moldex-realty.png" alt="Moldex Realty">
+                    </a>
+                    <div class="auth-card-header">
+                        <h2>Welcome back</h2>
+                    </div>
+
+                    <form class="auth-form" id="loginForm">
+                        <div class="form-group">
+                            <label for="loginEmail">Email address</label>
+                            <!-- Naka-off ang autocomplete para hindi lumabas ang mga naka-save na email -->
+                            <input type="email" id="loginEmail" name="email" autocomplete="off" required>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-label-row">
+                                <label for="loginPassword">Password</label>
+                                <a href="#" class="form-help-link" id="forgotLink">Forgot password?</a>
+                            </div>
+                            <!-- Naka-new-password para pigilan ang browser na mag-autofill ng lumang password -->
+                            <input type="password" id="loginPassword" name="password" autocomplete="new-password" required>
+                        </div>
+
+                        <div class="form-checkbox">
+                            <label>
+                                <input type="checkbox" name="remember">
+                                <span>Remember me</span>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-dark btn-large auth-submit" id="submitLoginBtn">Log in</button>
+                    </form>
+
+                    <div class="auth-register">
+                        <span>New to Moldex Realty?</span>
+                        <a href="register.html">Create an account</a>
+                    </div>
+
+                    <div class="auth-divider">
+                        <span>or</span>
+                    </div>
+
+                    <div class="auth-guest"><a href="booking.html" class="text-link">Book as guest</a></div>
+                </div>
+
+            </div>
+        </div>
+        <p class="auth-foot"><span>&copy; 2026 Moldex Realty</span></p>
+    </section>
+
+
+</main>
+
+
+<!-- FORGOT PASSWORD (3 steps: email -> code -> new password) -->
+<div class="fp-overlay" id="fpOverlay" hidden>
+    <div class="fp-dialog" role="dialog" aria-modal="true" aria-labelledby="fpTitle">
+        <button type="button" class="fp-close" id="fpClose" aria-label="Close">✕</button>
+        <h3 id="fpTitle">Forgot your password?</h3>
+        <p class="fp-lead" id="fpLead">Enter the email you registered with. We will send you a 6-digit code.</p>
+
+        <form id="fpStep1" class="fp-step">
+            <label for="fpEmail">Email address</label>
+            <input type="email" id="fpEmail" autocomplete="off" required>
+            <button type="submit" class="btn btn-dark btn-large fp-btn">Send code</button>
+        </form>
+
+        <form id="fpStep2" class="fp-step" hidden>
+            <label for="fpCode">6-digit code</label>
+            <input type="text" id="fpCode" class="fp-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
+            <label for="fpNew">New password</label>
+            <input type="password" id="fpNew" autocomplete="new-password" required>
+            <label for="fpNew2">Confirm new password</label>
+            <input type="password" id="fpNew2" autocomplete="new-password" required>
+            <button type="submit" class="btn btn-dark btn-large fp-btn">Change password</button>
+            <button type="button" class="fp-link" id="fpResend">Send a new code</button>
+        </form>
+
+        <p class="fp-msg" id="fpMsg" role="status" aria-live="polite"></p>
+    </div>
+</div>
+
+<script>
+(function () {
+    var API = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
+    var $ = function (id) { return document.getElementById(id); };
+    var overlay = $('fpOverlay'), msg = $('fpMsg'), step1 = $('fpStep1'), step2 = $('fpStep2');
+    var email = '';
+
+    function say(text, ok) { msg.textContent = text || ''; msg.className = 'fp-msg' + (text ? (ok ? ' ok' : ' bad') : ''); }
+    function open() {
+        step1.hidden = false; step2.hidden = true; say('');
+        $('fpLead').textContent = 'Enter the email you registered with. We will send you a 6-digit code.';
+        $('fpEmail').value = $('loginEmail') ? $('loginEmail').value : '';
+        overlay.hidden = false; $('fpEmail').focus();
+    }
+    function close() { overlay.hidden = true; }
+    async function post(path, body) {
+        var r = await fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        return r.json();
+    }
+    async function sendCode(btn) {
+        btn.disabled = true; say('Sending…', true);
+        try {
+            var d = await post('/forgot-password/request', { email: email });
+            say(d.message, d.success);
+            if (d.success) {
+                step1.hidden = true; step2.hidden = false;
+                $('fpLead').textContent = 'Check the inbox of ' + email + ' (and the Spam folder). Type the code and choose a new password.';
+                $('fpCode').focus();
+            }
+        } catch (e) { say('Cannot reach the server. Is node server.js running?', false); }
+        btn.disabled = false;
+    }
+
+    $('forgotLink').addEventListener('click', function (e) { e.preventDefault(); open(); });
+    $('fpClose').addEventListener('click', close);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });
+
+    step1.addEventListener('submit', function (e) {
+        e.preventDefault(); email = $('fpEmail').value.trim();
+        sendCode(step1.querySelector('button[type=submit]'));
+    });
+    $('fpResend').addEventListener('click', function () { sendCode($('fpResend')); });
+    $('fpCode').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
+
+    step2.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var p1 = $('fpNew').value, p2 = $('fpNew2').value;
+        if (p1 !== p2) return say('The two passwords do not match.', false);
+        var btn = step2.querySelector('button[type=submit]'); btn.disabled = true; say('Saving…', true);
+        try {
+            var d = await post('/forgot-password/reset', { email: email, code: $('fpCode').value, newPassword: p1 });
+            say(d.message, d.success);
+            if (d.success) {
+                if ($('loginEmail')) $('loginEmail').value = email;
+                if ($('loginPassword')) $('loginPassword').value = '';
+                setTimeout(function () { close(); if ($('loginPassword')) $('loginPassword').focus(); }, 1600);
+            }
+        } catch (err) { say('Cannot reach the server. Is node server.js running?', false); }
+        btn.disabled = false;
+    });
+})();
+</script>
+
+<script src="script.js"></script>
+<script src="nav.js"></script>
+<script src="hero-lines.js"></script>
+<script src="hero-ball3d.js"></script>
+<script src="legal.js"></script>
+<script src="smooth.js"></script>
+</body>
+</html>

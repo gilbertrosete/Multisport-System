@@ -1,0 +1,609 @@
+/* =========================================================
+   MULTISPORT — account button, account menu and Settings window
+   Shared by every page (index + inner pages). Colours come from the
+   Moldex Realty logo. Sharp corners, slanted shapes.
+   Delete this file and its <link> tags to go back to the old menu
+   (script.js would then need its old menu markup too).
+========================================================= */
+
+.acct {
+    --a-ember: #d9502f;
+    --a-orange: #ef7435;
+    --a-amber: #eaa63a;
+    --a-lime: #dcd650;
+    --a-deep: #091d14;
+    --a-forest: #0d2b1e;
+    --a-sunset: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%);
+    position: relative;
+    display: inline-block;
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ----- the button in the bar ----- */
+.acct-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 42px;
+    padding: 0 24px 0 10px;
+    border: 0;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    cursor: pointer;
+    clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+    transition: background-color .2s ease, color .2s ease;
+}
+.acct-trigger:hover,
+.acct-trigger[aria-expanded="true"] { background: #fff; color: var(--a-deep); }
+
+.acct-badge {
+    display: grid;
+    place-items: center;
+    min-width: 36px;
+    height: 28px;
+    padding: 0 6px;
+    margin-left: 8px;
+    background: var(--a-sunset);
+    color: var(--a-deep);
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0.04em;
+    clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+.acct-name {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.acct-chevron { flex: none; transition: transform .2s ease; }
+.acct-trigger[aria-expanded="true"] .acct-chevron { transform: rotate(180deg); }
+
+/* ----- the menu ----- */
+.acct-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    z-index: 1100;
+    width: 300px;
+    background: var(--a-deep);
+    color: #fff;
+    border-top: 5px solid;
+    border-image: var(--a-sunset) 1;
+    box-shadow: 0 26px 50px -18px rgba(0, 0, 0, 0.55);
+}
+.acct-head { display: grid; gap: 4px; padding: 20px 22px 18px; background: var(--a-forest); }
+.acct-kicker {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--a-orange);
+}
+.acct-head strong {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #fff;
+}
+.acct-mail { font-size: 13px; color: rgba(255, 255, 255, 0.66); word-break: break-all; }
+
+.acct-list { display: grid; padding: 8px 0; }
+.acct-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 13px 22px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.92);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+.acct-item::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--a-sunset);
+    transform: scaleY(0);
+    transition: transform .18s ease;
+}
+.acct-item:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.acct-item:hover::before { transform: scaleY(1); }
+.acct-ico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid rgba(239, 116, 53, 0.55);
+    color: var(--a-orange);
+}
+
+.acct-foot { padding: 6px 22px 22px; }
+.acct-logout {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    border: 0;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    transition: background .2s ease, color .2s ease;
+}
+.acct-logout:hover { background: var(--a-sunset); color: var(--a-deep); }
+
+/* ----- Settings window ----- */
+body.acct-modal-open { overflow: hidden; }
+.acct-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(5, 31, 21, 0.74);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.acct-panel {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    margin: auto;
+    padding: 34px 34px 30px;
+    background: #fff;
+    color: #10271c;
+    border-top: 6px solid;
+    border-image: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%) 1;
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.6);
+}
+.acct-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    width: 40px; height: 40px;
+    border: 0;
+    background: transparent;
+    color: #0d2b1e;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+}
+.acct-close:hover { color: #d9502f; }
+.acct-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #d9502f;
+}
+.acct-eyebrow::before {
+    content: "";
+    width: 30px; height: 8px;
+    background: linear-gradient(95deg, #d9502f, #eaa63a);
+    transform: skewX(-26deg);
+}
+.acct-panel h2 {
+    margin: 8px 0 6px;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: #0d2b1e;
+}
+.acct-sub { margin: 0 0 22px; font-size: 15px; color: #5a6359; }
+
+.acct-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.acct-field { display: grid; gap: 7px; margin-bottom: 16px; }
+.acct-field > span {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #d9502f;
+}
+.acct-field input {
+    width: 100%;
+    height: 50px;
+    padding: 0 14px;
+    border: 1.5px solid rgba(13, 43, 30, 0.28);
+    border-radius: 0;
+    background: #fff;
+    color: #10271c;
+    font-family: inherit;
+    font-size: 16px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.acct-field input:hover { border-color: rgba(13, 43, 30, 0.55); }
+.acct-field input:focus { outline: none; border-color: #ef7435; box-shadow: 0 0 0 3px rgba(239, 116, 53, 0.22); }
+.acct-field small { font-size: 13px; color: #5a6359; }
+.acct-lockwrap { position: relative; }
+.acct-lockwrap svg { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #5a6359; }
+.acct-locked input { padding-right: 40px; background: #eef1ec; color: #5a6359; cursor: not-allowed; border-style: dashed; }
+
+.acct-msg { min-height: 20px; margin: 2px 0 14px; font-size: 14px; font-weight: 600; }
+.acct-msg.is-error { color: #b42318; }
+.acct-msg.is-ok { color: #2f7a3a; }
+
+.acct-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.acct-btn {
+    min-height: 50px;
+    padding: 0 34px;
+    border: 0;
+    border-radius: 0;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(13px 0, 100% 0, calc(100% - 13px) 100%, 0 100%);
+    transition: filter .2s ease, background-color .2s ease, color .2s ease;
+}
+.acct-btn-main { background: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%); color: #091d14; }
+.acct-btn-main:hover { filter: brightness(1.08) saturate(1.1); }
+.acct-btn-main:disabled { opacity: .6; cursor: wait; }
+.acct-btn-ghost { background: rgba(13, 43, 30, 0.1); color: #0d2b1e; }
+.acct-btn-ghost:hover { background: #0d2b1e; color: #fff; }
+
+@media (max-width: 1000px) {
+    .acct { display: block; width: 100%; }
+    .acct-trigger { width: 100%; justify-content: flex-start; }
+    .acct-chevron { margin-left: auto; }
+    .acct-menu { position: static; width: 100%; margin-top: 10px; }
+}
+@media (max-width: 560px) {
+    .acct-panel { padding: 28px 20px 22px; }
+    .acct-row { grid-template-columns: 1fr; gap: 0; }
+    .acct-panel h2 { font-size: 38px; }
+    .acct-actions { flex-direction: column-reverse; }
+    .acct-btn { width: 100%; }
+}/* =========================================================
+   MULTISPORT — account button, account menu and Settings window
+   Shared by every page (index + inner pages). Colours come from the
+   Moldex Realty logo. Sharp corners, slanted shapes.
+   Delete this file and its <link> tags to go back to the old menu
+   (script.js would then need its old menu markup too).
+========================================================= */
+
+.acct {
+    --a-ember: #d9502f;
+    --a-orange: #ef7435;
+    --a-amber: #eaa63a;
+    --a-lime: #dcd650;
+    --a-deep: #091d14;
+    --a-forest: #0d2b1e;
+    --a-sunset: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%);
+    position: relative;
+    display: inline-block;
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ----- the button in the bar ----- */
+.acct-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 42px;
+    padding: 0 24px 0 10px;
+    border: 0;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    cursor: pointer;
+    clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+    transition: background-color .2s ease, color .2s ease;
+}
+.acct-trigger:hover,
+.acct-trigger[aria-expanded="true"] { background: #fff; color: var(--a-deep); }
+
+.acct-badge {
+    display: grid;
+    place-items: center;
+    min-width: 36px;
+    height: 28px;
+    padding: 0 6px;
+    margin-left: 8px;
+    background: var(--a-sunset);
+    color: var(--a-deep);
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0.04em;
+    clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+.acct-name {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.acct-chevron { flex: none; transition: transform .2s ease; }
+.acct-trigger[aria-expanded="true"] .acct-chevron { transform: rotate(180deg); }
+
+/* ----- the menu ----- */
+.acct-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    z-index: 1100;
+    width: 300px;
+    background: var(--a-deep);
+    color: #fff;
+    border-top: 5px solid;
+    border-image: var(--a-sunset) 1;
+    box-shadow: 0 26px 50px -18px rgba(0, 0, 0, 0.55);
+}
+.acct-head { display: grid; gap: 4px; padding: 20px 22px 18px; background: var(--a-forest); }
+.acct-kicker {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--a-orange);
+}
+.acct-head strong {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #fff;
+}
+.acct-mail { font-size: 13px; color: rgba(255, 255, 255, 0.66); word-break: break-all; }
+
+.acct-list { display: grid; padding: 8px 0; }
+.acct-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 13px 22px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.92);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .15s ease, color .15s ease;
+}
+.acct-item::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--a-sunset);
+    transform: scaleY(0);
+    transition: transform .18s ease;
+}
+.acct-item:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.acct-item:hover::before { transform: scaleY(1); }
+.acct-ico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border: 1.5px solid rgba(239, 116, 53, 0.55);
+    color: var(--a-orange);
+}
+
+.acct-foot { padding: 6px 22px 22px; }
+.acct-logout {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    border: 0;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    transition: background .2s ease, color .2s ease;
+}
+.acct-logout:hover { background: var(--a-sunset); color: var(--a-deep); }
+
+/* ----- Settings window ----- */
+body.acct-modal-open { overflow: hidden; }
+.acct-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(5, 31, 21, 0.74);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
+    font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.acct-panel {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    margin: auto;
+    padding: 34px 34px 30px;
+    background: #fff;
+    color: #10271c;
+    border-top: 6px solid;
+    border-image: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%) 1;
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.6);
+}
+.acct-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    width: 40px; height: 40px;
+    border: 0;
+    background: transparent;
+    color: #0d2b1e;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+}
+.acct-close:hover { color: #d9502f; }
+.acct-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #d9502f;
+}
+.acct-eyebrow::before {
+    content: "";
+    width: 30px; height: 8px;
+    background: linear-gradient(95deg, #d9502f, #eaa63a);
+    transform: skewX(-26deg);
+}
+.acct-panel h2 {
+    margin: 8px 0 6px;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 44px;
+    font-weight: 800;
+    font-style: italic;
+    line-height: 0.95;
+    text-transform: uppercase;
+    color: #0d2b1e;
+}
+.acct-sub { margin: 0 0 22px; font-size: 15px; color: #5a6359; }
+
+.acct-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.acct-field { display: grid; gap: 7px; margin-bottom: 16px; }
+.acct-field > span {
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #d9502f;
+}
+.acct-field input {
+    width: 100%;
+    height: 50px;
+    padding: 0 14px;
+    border: 1.5px solid rgba(13, 43, 30, 0.28);
+    border-radius: 0;
+    background: #fff;
+    color: #10271c;
+    font-family: inherit;
+    font-size: 16px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.acct-field input:hover { border-color: rgba(13, 43, 30, 0.55); }
+.acct-field input:focus { outline: none; border-color: #ef7435; box-shadow: 0 0 0 3px rgba(239, 116, 53, 0.22); }
+.acct-field small { font-size: 13px; color: #5a6359; }
+.acct-lockwrap { position: relative; }
+.acct-lockwrap svg { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: #5a6359; }
+.acct-locked input { padding-right: 40px; background: #eef1ec; color: #5a6359; cursor: not-allowed; border-style: dashed; }
+
+.acct-msg { min-height: 20px; margin: 2px 0 14px; font-size: 14px; font-weight: 600; }
+.acct-msg.is-error { color: #b42318; }
+.acct-msg.is-ok { color: #2f7a3a; }
+
+.acct-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.acct-btn {
+    min-height: 50px;
+    padding: 0 34px;
+    border: 0;
+    border-radius: 0;
+    font-family: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    clip-path: polygon(13px 0, 100% 0, calc(100% - 13px) 100%, 0 100%);
+    transition: filter .2s ease, background-color .2s ease, color .2s ease;
+}
+.acct-btn-main { background: linear-gradient(95deg, #d9502f 0%, #ef7435 38%, #eaa63a 72%, #dcd650 100%); color: #091d14; }
+.acct-btn-main:hover { filter: brightness(1.08) saturate(1.1); }
+.acct-btn-main:disabled { opacity: .6; cursor: wait; }
+.acct-btn-ghost { background: rgba(13, 43, 30, 0.1); color: #0d2b1e; }
+.acct-btn-ghost:hover { background: #0d2b1e; color: #fff; }
+
+@media (max-width: 1000px) {
+    .acct { display: block; width: 100%; }
+    .acct-trigger { width: 100%; justify-content: flex-start; }
+    .acct-chevron { margin-left: auto; }
+    .acct-menu { position: static; width: 100%; margin-top: 10px; }
+}
+@media (max-width: 560px) {
+    .acct-panel { padding: 28px 20px 22px; }
+    .acct-row { grid-template-columns: 1fr; gap: 0; }
+    .acct-panel h2 { font-size: 38px; }
+    .acct-actions { flex-direction: column-reverse; }
+    .acct-btn { width: 100%; }
+}
