@@ -597,6 +597,9 @@ app.post('/api/bookings', limitBooking, (req, res) => {
 
     // checked again here so the slot cannot be taken twice (two people paying at the same moment, or a direct API call)
     // The check and the save run inside a lock for this court + date, so two requests cannot both pass the check.
+    // a customer whose account the admin disabled cannot book at all, not even as a guest with the same e-mail.
+    // If this check itself fails (for example the column is not there yet) booking simply carries on as before.
+    const proceed = () => {
     withLock(courtKey + '|' + cleanDateStr, (release) => {
     findScheduleProblem(facility, cleanDateStr, time_slot, duration, (checkErr, problem) => {
         if (checkErr) {
@@ -645,6 +648,15 @@ app.post('/api/bookings', limitBooking, (req, res) => {
             res.json({ success: true, id: result.insertId, reference_no });
         });
     });
+    });
+    };
+
+    db.query("SELECT 1 FROM users WHERE LOWER(email) = LOWER(?) AND disabled = 1 AND (role IS NULL OR role <> 'admin') LIMIT 1", [emailClean], (blockErr, blocked) => {
+        if (blockErr) console.error('Disabled-account check skipped:', blockErr.message);
+        else if (blocked && blocked.length) {
+            return res.status(403).json({ success: false, message: 'This email belongs to an account that has been disabled, so new bookings cannot be made with it. Please contact Moldex Realty for help.' });
+        }
+        proceed();
     });
 });
 

@@ -3481,3 +3481,31 @@ body#homePage { overflow: hidden; }
 /* === HEADER LINE ONLY WHEN SCROLLED START (delete from here to END to go back) === */
 body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header:not(.scrolled) { border-bottom-color: transparent; }
 /* === HEADER LINE ONLY WHEN SCROLLED END === */
+
+/* === NO CARD NUMBERS START (delete from here to END to bring the 01-04 numbers back) === */
+body#homePage .facility-card::after { content: none; display: none; }
+/* === NO CARD NUMBERS END === */
+
+/* === CARD REVEAL ANIMATION START (delete from here to END to go back to the simple fade-up) ===
+   each court card is "painted" in from the bottom (the photo wipes up), the photo settles from a slight zoom,
+   then the name + price rise in. The cards come one after another. Switched off for reduced motion.
+   (the wipe is on the photo, not on the card itself, so the scroll detection keeps working) */
+@media (prefers-reduced-motion: no-preference) {
+body#homePage .grid-4 .facility-card.rv { opacity: 1; transform: none; background: transparent; }
+body#homePage .grid-4 .facility-card.rv .facility-img {
+    clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+    transition: clip-path 1s var(--ease);
+}
+body#homePage .grid-4 .facility-card.rv.in .facility-img { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+body#homePage .grid-4 .facility-card.rv .facility-img img { transform: scale(1.22); }
+body#homePage .grid-4 .facility-card.rv.in .facility-img img { transform: none; }
+body#homePage .grid-4 .facility-card.rv.in:hover .facility-img img { transform: scale(1.08); }
+body#homePage .grid-4 .facility-card.rv .facility-body {
+    opacity: 0; transform: translateY(22px);
+    transition: opacity .7s ease .45s, transform .8s var(--ease) .45s;
+}
+body#homePage .grid-4 .facility-card.rv.in .facility-body { opacity: 1; transform: none; }
+body#homePage .grid-4 .facility-card.rv .facility-status { opacity: 0; transition: opacity .6s ease .7s; }
+body#homePage .grid-4 .facility-card.rv.in .facility-status { opacity: 1; }
+}
+/* === CARD REVEAL ANIMATION END === */
