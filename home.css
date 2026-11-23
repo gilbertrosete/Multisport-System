@@ -3477,3 +3477,7 @@ body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage,
 html:has(body#homePage) { overflow-x: hidden; }
 body#homePage { overflow: hidden; }
 /* === NO WHITE STRIP UNDER FOOTER END === */
+
+/* === HEADER LINE ONLY WHEN SCROLLED START (delete from here to END to go back) === */
+body:is(#homePage, #facilitiesPage, #bookingPage, #guestBookingPage, #trackPage, #loginPage, #registerPage, #profilePage) .site-header:not(.scrolled) { border-bottom-color: transparent; }
+/* === HEADER LINE ONLY WHEN SCROLLED END === */

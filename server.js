@@ -55,6 +55,7 @@ db.getConnection((err, connection) => {
         console.log('Connected to MySQL Database (multisport_db)!');
         setupFacilityStatus();
         setupRescheduleColumns();
+        setupUserColumns();
     }
 });
 
@@ -206,6 +207,19 @@ function setupRescheduleColumns() {
                 if (err2) console.error('Could not add column ' + name + ':', err2);
                 else console.log('Added bookings.' + name);
             });
+        });
+    });
+}
+
+// users.disabled: 1 = the admin switched this customer's account off (login is refused).
+// Added by the server itself if missing, so the existing database and its data stay untouched.
+function setupUserColumns() {
+    db.query("SHOW COLUMNS FROM users LIKE 'disabled'", (err, rows) => {
+        if (err) return console.error('Users column check error:', err);
+        if (rows.length) return;
+        db.query('ALTER TABLE users ADD COLUMN disabled TINYINT(1) NOT NULL DEFAULT 0', (err2) => {
+            if (err2) console.error('Could not add column users.disabled:', err2);
+            else console.log('Added users.disabled');
         });
     });
 }
@@ -1022,6 +1036,11 @@ app.post('/api/login', limitAccount, (req, res) => {
         try { match = await bcrypt.compare(password, user.password); } catch (e) { match = false; }
         if (!match) return failed();
 
+        // correct password, but the admin switched this customer's account off
+        if (Number(user.disabled) === 1 && user.role !== 'admin') {
+            return res.json({ success: false, message: 'This account has been disabled. Please contact Moldex Realty for help.' });
+        }
+
         delete loginAttempts[key];
 
         const isAdmin = user.role === 'admin';
@@ -1176,6 +1195,64 @@ app.get('/api/users/count', requireAdmin, (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         res.json({ total: results[0].total });
+    });
+});
+
+// ---------------------------------------------------------------
+// ADMIN: USERS TAB
+// List of customer accounts (never the password) with how many bookings each one made,
+// and a switch to disable / enable an account. Admin accounts are never listed or changed here.
+// Bookings are matched by e-mail (guest bookings with the same e-mail are counted too).
+// ---------------------------------------------------------------
+app.get('/api/admin/users', requireAdmin, (req, res) => {
+    const sql = `
+        SELECT u.id, u.email, u.firstName, u.lastName, u.phone, u.created_at,
+               COALESCE(u.disabled, 0) AS disabled,
+               (SELECT COUNT(*) FROM bookings b
+                 WHERE LOWER(b.email) = LOWER(u.email) AND b.is_deleted = 0) AS booking_count,
+               (SELECT COUNT(*) FROM bookings b
+                 WHERE LOWER(b.email) = LOWER(u.email) AND b.is_deleted = 0
+                   AND b.booking_status IN ('Pending', 'Approved')) AS active_count,
+               (SELECT MAX(b.booking_date) FROM bookings b
+                 WHERE LOWER(b.email) = LOWER(u.email) AND b.is_deleted = 0) AS last_booking
+        FROM users u
+        WHERE u.role IS NULL OR u.role <> 'admin'
+        ORDER BY u.created_at DESC, u.id DESC`;
+    db.query(sql, (err, rows) => {
+        if (err) {
+            console.error('Admin users list error:', err);
+            return res.status(500).json({ success: false, message: 'Database error' });
+        }
+        res.json(rows.map(r => ({
+            id: r.id,
+            email: r.email,
+            firstName: r.firstName,
+            lastName: r.lastName,
+            phone: r.phone,
+            created_at: r.created_at,
+            disabled: Number(r.disabled) === 1,
+            booking_count: Number(r.booking_count) || 0,
+            active_count: Number(r.active_count) || 0,
+            last_booking: r.last_booking || null
+        })));
+    });
+});
+
+app.put('/api/admin/users/:id/disabled', requireAdmin, (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id < 1) return res.status(400).json({ success: false, message: 'Invalid user.' });
+    const disable = (req.body || {}).disabled === true || (req.body || {}).disabled === 1;
+    db.query('SELECT email, role FROM users WHERE id = ?', [id], (err, rows) => {
+        if (err) { console.error('Disable user error:', err); return res.status(500).json({ success: false, message: 'Database error' }); }
+        if (!rows.length) return res.status(404).json({ success: false, message: 'User not found.' });
+        if (rows[0].role === 'admin') return res.status(403).json({ success: false, message: 'Admin accounts cannot be changed here.' });
+        const email = String(rows[0].email || '').trim().toLowerCase();
+        db.query('UPDATE users SET disabled = ? WHERE id = ?', [disable ? 1 : 0, id], (err2) => {
+            if (err2) { console.error('Disable user error:', err2); return res.status(500).json({ success: false, message: 'Database error' }); }
+            // a disabled customer who is logged in right now is signed out immediately
+            if (disable) for (const [t, v] of userTokens) if (v.email === email) userTokens.delete(t);
+            res.json({ success: true, disabled: disable });
+        });
     });
 });
 

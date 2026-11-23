@@ -42,6 +42,10 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
                 Reservations
             </a>
+            <a href="#users" data-nav="users">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 5.2a3.4 3.4 0 0 1 0 6.3M18 14.3c2.2.7 3.5 2.6 3.5 5.7"/></svg>
+                Users
+            </a>
             <a href="#calendar" data-nav="calendar">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
                 Calendar
@@ -322,6 +326,78 @@
 
                 <div class="table-more" id="tableMore" hidden>
                     <button type="button" class="more-btn" id="tableMoreBtn">Show more</button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ===================== USERS ===================== -->
+        <section class="adm-section" id="users">
+
+            <div class="adm-head">
+                <div>
+                    <h2>Users</h2>
+                    <p>Customers who created an account. Disable an account to stop that person from logging in.</p>
+                </div>
+            </div>
+
+            <div class="count-strip users-strip">
+                <div class="stat-card users">
+                    <span class="stat-label">Registered users</span>
+                    <strong class="stat-value" id="usrTotal">0</strong>
+                    <span class="stat-sub">Customers with an account</span>
+                </div>
+                <div class="stat-card success">
+                    <span class="stat-label">Active accounts</span>
+                    <strong class="stat-value" id="usrActive">0</strong>
+                    <span class="stat-sub">Can log in</span>
+                </div>
+                <div class="stat-card danger">
+                    <span class="stat-label">Disabled accounts</span>
+                    <strong class="stat-value" id="usrDisabled">0</strong>
+                    <span class="stat-sub">Login is blocked</span>
+                </div>
+            </div>
+
+            <div class="adm-card">
+
+                <div class="table-bar">
+                    <div class="admin-filter" role="group" aria-label="Filter users">
+                        <button type="button" class="filter-btn active" data-user-filter="all">All</button>
+                        <button type="button" class="filter-btn" data-user-filter="active">Active</button>
+                        <button type="button" class="filter-btn" data-user-filter="disabled">Disabled</button>
+                    </div>
+
+                    <div class="table-tools">
+                        <span class="table-count" id="usrCount" aria-live="polite"></span>
+                        <label class="sr-only" for="usrSearch">Search users</label>
+                        <input type="search" class="adm-search" id="usrSearch" placeholder="Search name, email, phone" autocomplete="off">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table users-table">
+                        <thead>
+                            <tr>
+                                <th class="col-no">No.</th>
+                                <th>User</th>
+                                <th>Phone</th>
+                                <th>Registered</th>
+                                <th>Bookings</th>
+                                <th>Account</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usrBody">
+                            <!-- live records from admin.js -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-more" id="usrMore" hidden>
+                    <button type="button" class="more-btn" id="usrMoreBtn">Show more</button>
                 </div>
 
             </div>

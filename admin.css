@@ -2568,6 +2568,7 @@ body { background: var(--surface); }
 .adm-main[data-view="overview"] #overview,
 .adm-main[data-view="revenue"] #revenue,
 .adm-main[data-view="reservations"] #reservations,
+.adm-main[data-view="users"] #users,
 .adm-main[data-view="calendar"] #calendar,
 .adm-main[data-view="facilityControlSection"] #facilityControlSection { display: block; margin-top: 6px; }
 
@@ -2933,3 +2934,10 @@ body { background: var(--surface); }
 .ov-panel-head h3 { display: flex; align-items: center; gap: 10px; }
 .ov-seeall { border: 0; background: none; cursor: pointer; font: 600 14px 'DM Sans', system-ui, sans-serif; color: var(--a-green, #0f5a3b); padding: 4px 0; }
 .ov-seeall:hover, .ov-seeall:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
+
+/* === USERS TAB START (delete from here to END to go back) === */
+.users-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.users-table .row-disabled td { opacity: .62; }
+.users-table .row-disabled td:last-child { opacity: 1; }
+@media (max-width: 700px) { .users-strip { grid-template-columns: 1fr; } }
+/* === USERS TAB END === */

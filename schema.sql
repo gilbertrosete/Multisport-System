@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone       VARCHAR(30)  NULL,
     address     VARCHAR(255) NULL,
     role        VARCHAR(20)  NOT NULL DEFAULT 'customer',   -- 'customer' or 'admin'
+    disabled    TINYINT(1)   NOT NULL DEFAULT 0,                        -- 1 = admin switched the account off (cannot log in)
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_users_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

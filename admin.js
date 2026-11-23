@@ -1367,9 +1367,129 @@
             });
         }
 
+        /* ---------- Users tab: list, search, booking count, disable / enable ---------- */
+        (function () {
+            var users = [], uFilter = 'all', uSearch = '', uLimit = PAGE_SIZE, loaded = false;
+            var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            function fmtDay(v) {
+                var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || ''));
+                return m ? MONTHS[Number(m[2]) - 1] + ' ' + Number(m[3]) + ', ' + m[1] : '—';
+            }
+            function fullName(u) {
+                var n = ((u.firstName || '') + ' ' + (u.lastName || '')).trim();
+                return n || '(no name)';
+            }
+            function shown() {
+                var q = uSearch.toLowerCase();
+                return users.filter(function (u) {
+                    if (uFilter === 'active' && u.disabled) return false;
+                    if (uFilter === 'disabled' && !u.disabled) return false;
+                    if (!q) return true;
+                    return [fullName(u), u.email, u.phone].join(' ').toLowerCase().indexOf(q) !== -1;
+                });
+            }
+
+            function paintUsers() {
+                var body = $('usrBody');
+                if (!body) return;
+                var off = users.filter(function (u) { return u.disabled; }).length;
+                $('usrTotal').textContent = users.length;
+                $('usrActive').textContent = users.length - off;
+                $('usrDisabled').textContent = off;
+
+                document.querySelectorAll('[data-user-filter]').forEach(function (btn) {
+                    btn.classList.toggle('active', btn.getAttribute('data-user-filter') === uFilter);
+                });
+
+                var rows = shown(), part = rows.slice(0, uLimit), more = rows.length - part.length;
+                $('usrCount').textContent = more > 0
+                    ? 'Showing ' + part.length + ' of ' + plural(rows.length, 'user', 'users')
+                    : 'Showing ' + plural(rows.length, 'user', 'users');
+                $('usrMore').hidden = more <= 0;
+                $('usrMoreBtn').textContent = 'Show ' + Math.min(PAGE_SIZE, more) + ' more (' + more + ' left)';
+
+                if (!rows.length) {
+                    body.innerHTML = '<tr><td colspan="7" class="table-empty">' +
+                        (loaded ? (users.length ? 'No users match this search.' : 'No customer has created an account yet.') : 'Loading…') + '</td></tr>';
+                    return;
+                }
+                body.innerHTML = part.map(function (u, i) {
+                    var bk = u.booking_count
+                        ? '<span class="cell-strong">' + u.booking_count + '</span><span class="cell-sub nowrap">' +
+                          (u.active_count ? u.active_count + ' active · ' : '') + 'last ' + esc(fmtDay(u.last_booking)) + '</span>'
+                        : '<span class="cell-sub">No bookings yet</span>';
+                    return '<tr class="' + (u.disabled ? 'row-disabled' : '') + '">' +
+                        '<td class="cell-no">' + (i + 1) + '</td>' +
+                        '<td><span class="cell-strong">' + esc(fullName(u)) + '</span><span class="cell-sub">' + esc(u.email) + '</span></td>' +
+                        '<td><span class="cell-sub nowrap">' + esc(u.phone || '—') + '</span></td>' +
+                        '<td><span class="cell-strong nowrap">' + esc(fmtDay(u.created_at)) + '</span></td>' +
+                        '<td>' + bk + '</td>' +
+                        '<td><span class="pill ' + (u.disabled ? 'pill-rejected' : 'pill-approved') + '">' + (u.disabled ? 'Disabled' : 'Active') + '</span></td>' +
+                        '<td><div class="row-actions">' + (u.disabled
+                            ? '<button type="button" class="abtn go" data-user-act="enable" data-id="' + u.id + '">Enable</button>'
+                            : '<button type="button" class="abtn danger" data-user-act="disable" data-id="' + u.id + '">Disable</button>') +
+                        '</div></td></tr>';
+                }).join('');
+            }
+
+            window.admLoadUsers = async function () {
+                try {
+                    var res = await authFetch(API + '/admin/users');
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    var data = await res.json();
+                    users = Array.isArray(data) ? data : [];
+                    loaded = true;
+                    paintUsers();
+                } catch (err) {
+                    loaded = true;
+                    var body = $('usrBody');
+                    if (body && !users.length) {
+                        var msg = String(err && err.message);
+                        body.innerHTML = '<tr><td colspan="7" class="table-empty">' +
+                            (msg.indexOf('HTTP 404') !== -1 ? 'Update server.js, then restart it (node server.js).' : 'Could not load users. Check the node server.js terminal.') + '</td></tr>';
+                    }
+                }
+            };
+
+            document.addEventListener('click', async function (e) {
+                var f = e.target.closest('[data-user-filter]');
+                if (f) { uFilter = f.getAttribute('data-user-filter'); uLimit = PAGE_SIZE; paintUsers(); return; }
+                if (e.target.closest('#usrMoreBtn')) { uLimit += PAGE_SIZE; paintUsers(); return; }
+                var btn = e.target.closest('[data-user-act]');
+                if (!btn) return;
+                var id = Number(btn.getAttribute('data-id'));
+                var u = users.filter(function (x) { return x.id === id; })[0];
+                if (!u) return;
+                var off = btn.getAttribute('data-user-act') === 'disable';
+                var ok = await ask({
+                    title: off ? 'Disable this account?' : 'Enable this account?',
+                    text: off
+                        ? fullName(u) + ' (' + u.email + ') will be signed out and will not be able to log in until you enable the account again. Their existing bookings are not changed.'
+                        : fullName(u) + ' (' + u.email + ') will be able to log in again.',
+                    confirmLabel: off ? 'Disable account' : 'Enable account',
+                    danger: off
+                });
+                if (!ok) return;
+                try {
+                    var res = await authFetch(API + '/admin/users/' + id + '/disabled', { method: 'PUT', body: JSON.stringify({ disabled: off }) });
+                    var data = await res.json().catch(function () { return {}; });
+                    if (!res.ok || !data.success) throw new Error(data.message || 'Could not update the account.');
+                    u.disabled = off;
+                    paintUsers();
+                    toast(off ? 'Account disabled.' : 'Account enabled.');
+                } catch (err) {
+                    toast(err.message || 'Could not update the account.', true);
+                }
+            });
+
+            var us = $('usrSearch');
+            if (us) us.addEventListener('input', function () { uSearch = us.value.trim(); uLimit = PAGE_SIZE; paintUsers(); });
+        })();
+
         /* one view at a time: the sidebar switches between Overview, Revenue,
            Reservations, Calendar and Courts instead of one very long page */
-        var VIEWS = ['overview', 'revenue', 'reservations', 'calendar', 'facilityControlSection'];
+        var VIEWS = ['overview', 'revenue', 'reservations', 'users', 'calendar', 'facilityControlSection'];
         var mainEl = document.querySelector('.adm-main');
         var navLinks = document.querySelectorAll('.adm-nav a[data-nav]');
         window.admShowView = function (id, keepScroll) {
@@ -1377,6 +1497,7 @@
             if (mainEl) mainEl.setAttribute('data-view', id);
             navLinks.forEach(function (a) { a.classList.toggle('active', a.getAttribute('data-nav') === id); });
             try { history.replaceState(null, '', '#' + id); } catch (err) { /* ignore */ }
+            if (id === 'users' && window.admLoadUsers) window.admLoadUsers();
             if (!keepScroll) window.scrollTo(0, 0);
         };
         navLinks.forEach(function (a) {
