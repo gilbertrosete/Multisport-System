@@ -22,7 +22,7 @@
     var UPDATED = 'November 2026';
     var BRAND = 'Moldex Realty';                          /* the name shown at the top of the pop-up and in the text */
     var PLACE = 'MetroGate Silang Estates';
-    var CONTACT = 'reservations@multisport.com';          /* replace with the real contact address */
+    var CONTACT = 'MoldexRealty@gmail.com';                /* contact address shown in the privacy text (same as the footer) */
     var STORE_KEY = 'msPrivacyAgreed';
     var VERSION = '1';
     var GATED = ['continueBookingBtn', 'submitGuestBooking', 'submitRegisterBtn'];   /* buttons that wait for the agreement */

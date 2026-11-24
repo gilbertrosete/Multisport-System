@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | MultiSport</title>
+    <title>Admin Dashboard | Moldex Realty</title>
     <link rel="icon" type="image/png" href="img/favicon.png">
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 
@@ -24,7 +24,7 @@
     <aside class="adm-side">
 
         <a href="admin-dashboard.html" class="adm-logo">
-            <img src="img/logo-moldex-realty.png" alt="MultiSport">
+            <img src="img/logo-moldex-realty.png" alt="Moldex Realty">
         </a>
 
         <div class="adm-side-label">Menu</div>
@@ -45,6 +45,10 @@
             <a href="#users" data-nav="users">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 5.2a3.4 3.4 0 0 1 0 6.3M18 14.3c2.2.7 3.5 2.6 3.5 5.7"/></svg>
                 Users
+            </a>
+            <a href="#reports" data-nav="reports">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 17v-3M12 17v-6M15 17v-4"/></svg>
+                Reports
             </a>
             <a href="#calendar" data-nav="calendar">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
@@ -400,6 +404,96 @@
                     <button type="button" class="more-btn" id="usrMoreBtn">Show more</button>
                 </div>
 
+            </div>
+
+        </section>
+
+
+        <!-- ===================== REPORTS ===================== -->
+        <section class="adm-section" id="reports">
+
+            <div class="adm-head">
+                <div>
+                    <h2>Reports</h2>
+                    <p>Choose a period, then download the bookings as a spreadsheet (CSV) or print a summary report.</p>
+                </div>
+            </div>
+
+            <div class="adm-card rep-card">
+                <div class="rep-controls">
+                    <div class="rep-field">
+                        <label for="repFrom">From</label>
+                        <input type="date" id="repFrom" class="adm-search">
+                    </div>
+                    <div class="rep-field">
+                        <label for="repTo">To</label>
+                        <input type="date" id="repTo" class="adm-search">
+                    </div>
+                    <div class="rep-field">
+                        <label for="repStatus">Status</label>
+                        <select id="repStatus" class="adm-search">
+                            <option value="all">All statuses</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Pending">Pending</option>
+                            <option value="closed">Rejected / Cancelled</option>
+                            <option value="Refunded">Refunded</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="rep-quick" role="group" aria-label="Quick periods">
+                    <button type="button" class="filter-btn" data-rep-quick="week">Last 7 days</button>
+                    <button type="button" class="filter-btn active" data-rep-quick="month">This month</button>
+                    <button type="button" class="filter-btn" data-rep-quick="lastmonth">Last month</button>
+                    <button type="button" class="filter-btn" data-rep-quick="year">This year</button>
+                    <button type="button" class="filter-btn" data-rep-quick="all">All time</button>
+                </div>
+                <p class="rep-note">The dates are the <b>reservation date</b> (the day the court is used). Revenue counts <b>Approved</b> bookings only.</p>
+            </div>
+
+            <div class="count-strip rep-strip">
+                <div class="stat-card">
+                    <span class="stat-label">Bookings in period</span>
+                    <strong class="stat-value" id="repTotal">0</strong>
+                    <span class="stat-sub" id="repTotalSub">With the status chosen above</span>
+                </div>
+                <div class="stat-card success">
+                    <span class="stat-label">Approved</span>
+                    <strong class="stat-value" id="repApproved">0</strong>
+                    <span class="stat-sub" id="repHours">0 hours booked</span>
+                </div>
+                <div class="stat-card users">
+                    <span class="stat-label">Revenue</span>
+                    <strong class="stat-value" id="repRevenue">₱0.00</strong>
+                    <span class="stat-sub">From approved bookings</span>
+                </div>
+                <div class="stat-card danger">
+                    <span class="stat-label">Refunds</span>
+                    <strong class="stat-value" id="repRefund">₱0.00</strong>
+                    <span class="stat-sub" id="repRefundSub">Still to send back</span>
+                </div>
+            </div>
+
+            <div class="adm-card">
+                <div class="table-bar">
+                    <h3 class="rep-h3">By court</h3>
+                    <div class="table-tools rep-actions">
+                        <button type="button" class="abtn go" id="repCsv">Download CSV</button>
+                        <button type="button" class="abtn" id="repPrint">Print / Save as PDF</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Court</th>
+                                <th>Approved bookings</th>
+                                <th>Hours</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody id="repCourts"></tbody>
+                    </table>
+                </div>
             </div>
 
         </section>

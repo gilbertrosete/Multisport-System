@@ -1,4 +1,4 @@
-# MultiSport - Sports Facility Reservation System
+# Moldex Realty - Sports Facility Reservation System
 MetroGate Silang Estates, by Moldex Realty. Customers (and guests) reserve the basketball, volleyball,
 tennis and badminton courts online; the admin approves bookings, handles cancel / reschedule requests and
 manages court status.

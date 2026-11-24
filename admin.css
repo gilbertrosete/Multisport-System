@@ -2569,6 +2569,7 @@ body { background: var(--surface); }
 .adm-main[data-view="revenue"] #revenue,
 .adm-main[data-view="reservations"] #reservations,
 .adm-main[data-view="users"] #users,
+.adm-main[data-view="reports"] #reports,
 .adm-main[data-view="calendar"] #calendar,
 .adm-main[data-view="facilityControlSection"] #facilityControlSection { display: block; margin-top: 6px; }
 
@@ -2941,3 +2942,20 @@ body { background: var(--surface); }
 .users-table .row-disabled td:last-child { opacity: 1; }
 @media (max-width: 700px) { .users-strip { grid-template-columns: 1fr; } }
 /* === USERS TAB END === */
+
+/* === REPORTS TAB START (delete from here to END to go back) === */
+.rep-card { padding: 22px 24px; margin-bottom: 16px; }
+.rep-controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+.rep-field { display: flex; flex-direction: column; gap: 6px; }
+.rep-field label { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.rep-field .adm-search { width: 190px; }
+.rep-quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.rep-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+.rep-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rep-h3 { font-size: 17px; margin: 0; }
+.rep-actions { display: flex; gap: 10px; }
+.rep-actions .abtn:disabled { opacity: .45; cursor: not-allowed; }
+.rep-total td { background: rgba(15, 107, 59, .06); }
+@media (max-width: 900px) { .rep-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .rep-strip { grid-template-columns: 1fr; } .rep-field, .rep-field .adm-search { width: 100%; } }
+/* === REPORTS TAB END === */

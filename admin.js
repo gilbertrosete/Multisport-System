@@ -1487,9 +1487,185 @@
             if (us) us.addEventListener('input', function () { uSearch = us.value.trim(); uLimit = PAGE_SIZE; paintUsers(); });
         })();
 
+        /* ---------- Reports tab: period + status, summary, CSV download, printable report ---------- */
+        (function () {
+            var NAMES = { basketball: 'Basketball', volleyball: 'Volleyball', tennis: 'Tennis', badminton: 'Badminton', other: 'Other' };
+            var current = { list: [], from: '', to: '', status: 'all' };
+
+            function todayIso() { return iso(new Date()); }
+
+            function setQuick(kind) {
+                var t = todayIso(), d = fromIso(t), from = '', to = t;
+                if (kind === 'week') from = addDays(t, -6);
+                else if (kind === 'month') { from = iso(new Date(d.getFullYear(), d.getMonth(), 1)); to = iso(new Date(d.getFullYear(), d.getMonth() + 1, 0)); }
+                else if (kind === 'lastmonth') { from = iso(new Date(d.getFullYear(), d.getMonth() - 1, 1)); to = iso(new Date(d.getFullYear(), d.getMonth(), 0)); }
+                else if (kind === 'year') { from = d.getFullYear() + '-01-01'; to = d.getFullYear() + '-12-31'; }
+                else { from = ''; to = ''; }
+                $('repFrom').value = from;
+                $('repTo').value = to;
+                document.querySelectorAll('[data-rep-quick]').forEach(function (b) {
+                    b.classList.toggle('active', b.getAttribute('data-rep-quick') === kind);
+                });
+                paintReport();
+            }
+
+            function matchStatus(b, want) {
+                var s = statusOf(b);
+                if (want === 'all') return true;
+                if (want === 'closed') return s === 'Rejected' || s === 'Cancelled';
+                return s === want;
+            }
+
+            function compute() {
+                var from = $('repFrom').value, to = $('repTo').value, want = $('repStatus').value;
+                if (from && to && from > to) { var tmp = from; from = to; to = tmp; }
+                var list = (state.bookings || []).filter(function (b) {
+                    var d = dateOf(b);
+                    if (from && d < from) return false;
+                    if (to && d > to) return false;
+                    return matchStatus(b, want);
+                }).sort(function (x, y) {
+                    return dateOf(x) < dateOf(y) ? -1 : dateOf(x) > dateOf(y) ? 1 : String(x.time_slot).localeCompare(String(y.time_slot));
+                });
+                var sum = { total: list.length, approved: 0, hours: 0, revenue: 0, refundDue: 0, refundDone: 0, courts: {} };
+                COURTS.forEach(function (c) { sum.courts[c.key] = { count: 0, hours: 0, revenue: 0 }; });
+                list.forEach(function (b) {
+                    var s = statusOf(b), k = courtKey(b.facility);
+                    if (!sum.courts[k]) sum.courts[k] = { count: 0, hours: 0, revenue: 0 };
+                    if (s === 'Approved') {
+                        sum.approved++;
+                        sum.hours += num(b.duration_hours);
+                        sum.revenue += num(b.amount);
+                        sum.courts[k].count++;
+                        sum.courts[k].hours += num(b.duration_hours);
+                        sum.courts[k].revenue += num(b.amount);
+                    }
+                    if (isRefundDue(b)) sum.refundDue += num(b.amount);
+                    if (s === 'Refunded') sum.refundDone += num(b.amount);
+                });
+                current = { list: list, from: from, to: to, status: want, sum: sum };
+                return current;
+            }
+
+            function paintReport() {
+                var r = compute(), s = r.sum;
+                $('repTotal').textContent = s.total;
+                $('repApproved').textContent = s.approved;
+                $('repHours').textContent = plural(s.hours, 'hour', 'hours') + ' booked';
+                $('repRevenue').textContent = peso(s.revenue);
+                $('repRefund').textContent = peso(s.refundDue);
+                $('repRefundSub').textContent = s.refundDone ? 'to send back · ' + peso(s.refundDone) + ' already refunded' : 'Still to send back';
+                var rows = Object.keys(s.courts).filter(function (k) { return k !== 'other' || s.courts[k].count; }).map(function (k) {
+                    var c = s.courts[k];
+                    return '<tr><td><span class="cell-strong">' + esc(NAMES[k] || k) + '</span></td><td>' + c.count + '</td><td>' + c.hours +
+                        '</td><td><span class="cell-strong">' + esc(peso(c.revenue)) + '</span></td></tr>';
+                });
+                rows.push('<tr class="rep-total"><td><span class="cell-strong">Total</span></td><td><b>' + s.approved + '</b></td><td><b>' + s.hours +
+                    '</b></td><td><b>' + esc(peso(s.revenue)) + '</b></td></tr>');
+                $('repCourts').innerHTML = rows.join('');
+                $('repCsv').disabled = !r.list.length;
+                $('repPrint').disabled = !r.list.length;
+            }
+
+            /* a cell that starts with = + - @ could run as a formula when opened in Excel, so it gets a ' in front */
+            function cell(v) {
+                var t = String(v == null ? '' : v);
+                if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+                return '"' + t.replace(/"/g, '""') + '"';
+            }
+
+            function periodText() {
+                var r = current;
+                if (!r.from && !r.to) return 'All dates';
+                return (r.from || 'start') + ' to ' + (r.to || 'today');
+            }
+
+            function downloadCsv() {
+                var r = compute();
+                if (!r.list.length) { toast('No bookings in this period.', true); return; }
+                var head = ['Reference no.', 'Booker', 'Email', 'Phone', 'Facility', 'Reservation date', 'Time slot', 'Hours', 'Amount (PHP)', 'Status', 'Cancelled by', 'Booked on'];
+                var lines = [head.map(cell).join(',')];
+                r.list.forEach(function (b) {
+                    lines.push([b.reference_no, b.fullname, b.email, b.phone, b.facility, dateOf(b), b.time_slot, b.duration_hours || 1,
+                        num(b.amount).toFixed(2), statusOf(b), b.cancelled_by || '', String(b.created_at || '').replace('T', ' ').slice(0, 19)].map(cell).join(','));
+                });
+                var blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'moldex-realty-bookings_' + (r.from || 'start') + '_to_' + (r.to || 'today') + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+                toast('CSV downloaded (' + plural(r.list.length, 'booking', 'bookings') + ').');
+            }
+
+            function printReport() {
+                var r = compute(), s = r.sum;
+                if (!r.list.length) { toast('No bookings in this period.', true); return; }
+                var w = window.open('', '_blank');
+                if (!w) { toast('Allow pop-ups for this page, then try again.', true); return; }
+                var statusLabel = { all: 'All statuses', closed: 'Rejected / Cancelled' }[r.status] || r.status;
+                var courtRows = Object.keys(s.courts).filter(function (k) { return k !== 'other' || s.courts[k].count; }).map(function (k) {
+                    var c = s.courts[k];
+                    return '<tr><td>' + esc(NAMES[k] || k) + '</td><td class="n">' + c.count + '</td><td class="n">' + c.hours + '</td><td class="n">' + esc(peso(c.revenue)) + '</td></tr>';
+                }).join('');
+                var rows = r.list.map(function (b, i) {
+                    return '<tr><td>' + (i + 1) + '</td><td>' + esc(b.reference_no) + '</td><td>' + esc(b.fullname) + '</td><td>' + esc(b.facility) +
+                        '</td><td>' + esc(dateOf(b)) + '<br>' + esc(b.time_slot) + '</td><td class="n">' + esc(b.duration_hours || 1) + '</td><td class="n">' +
+                        esc(peso(num(b.amount))) + '</td><td>' + esc(statusOf(b)) + '</td></tr>';
+                }).join('');
+                var now = new Date();
+                var html = '<!doctype html><html><head><meta charset="utf-8"><title>Moldex Realty booking report ' + esc(periodText()) + '</title><style>' +
+                    '*{box-sizing:border-box}body{font:13px/1.45 Arial,Helvetica,sans-serif;color:#10271c;margin:28px}' +
+                    'h1{font-size:22px;margin:0}h2{font-size:15px;margin:22px 0 8px}.sub{color:#5a6359;margin:4px 0 0}' +
+                    '.top{border-bottom:3px solid #0f6b3b;padding-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end}' +
+                    '.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}' +
+                    '.card{border:1px solid #cfd8d2;border-radius:6px;padding:10px 12px}.card span{display:block;color:#5a6359;font-size:11px;text-transform:uppercase;letter-spacing:.04em}' +
+                    '.card b{font-size:20px}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #dfe5e1;padding:6px 8px;text-align:left;vertical-align:top}' +
+                    'th{background:#eef3ef;font-size:11px;text-transform:uppercase;letter-spacing:.04em}.n{text-align:right;white-space:nowrap}' +
+                    'tr{page-break-inside:avoid}.foot{margin-top:18px;color:#5a6359;font-size:11px}' +
+                    '@media print{body{margin:14mm}}</style></head><body>' +
+                    '<div class="top"><div><h1>Moldex Realty</h1><p class="sub">Sports Facility Booking Report · MetroGate Silang Estates</p></div>' +
+                    '<div class="sub" style="text-align:right">Period: <b>' + esc(periodText()) + '</b> (reservation date)<br>Status: ' + esc(statusLabel) +
+                    '<br>Printed: ' + esc(now.toLocaleString('en-PH')) + '</div></div>' +
+                    '<div class="cards"><div class="card"><span>Bookings</span><b>' + s.total + '</b></div>' +
+                    '<div class="card"><span>Approved</span><b>' + s.approved + '</b></div>' +
+                    '<div class="card"><span>Revenue</span><b>' + esc(peso(s.revenue)) + '</b></div>' +
+                    '<div class="card"><span>Refunds to send</span><b>' + esc(peso(s.refundDue)) + '</b></div></div>' +
+                    '<h2>By court (approved bookings)</h2><table><thead><tr><th>Court</th><th class="n">Bookings</th><th class="n">Hours</th><th class="n">Revenue</th></tr></thead><tbody>' +
+                    courtRows + '<tr><td><b>Total</b></td><td class="n"><b>' + s.approved + '</b></td><td class="n"><b>' + s.hours + '</b></td><td class="n"><b>' + esc(peso(s.revenue)) + '</b></td></tr></tbody></table>' +
+                    '<h2>All bookings in this report</h2><table><thead><tr><th>#</th><th>Reference</th><th>Booker</th><th>Court</th><th>Schedule</th><th class="n">Hrs</th><th class="n">Amount</th><th>Status</th></tr></thead><tbody>' +
+                    rows + '</tbody></table><p class="foot">Revenue counts approved bookings only. Generated by the Moldex Realty admin dashboard.</p>' +
+                    '<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script></body></html>';
+                w.document.open();
+                w.document.write(html);
+                w.document.close();
+            }
+
+            window.admOpenReports = async function () {
+                if (!$('repFrom').value && !$('repTo').value && !document.querySelector('[data-rep-quick].active')) setQuick('month');
+                paintReport();
+                try { await load(); paintReport(); } catch (err) { /* keep what is already loaded */ }
+            };
+
+            document.addEventListener('click', function (e) {
+                var q = e.target.closest('[data-rep-quick]');
+                if (q) { setQuick(q.getAttribute('data-rep-quick')); return; }
+                if (e.target.closest('#repCsv')) downloadCsv();
+                else if (e.target.closest('#repPrint')) printReport();
+            });
+            ['repFrom', 'repTo', 'repStatus'].forEach(function (id) {
+                $(id).addEventListener('change', function () {
+                    if (id !== 'repStatus') document.querySelectorAll('[data-rep-quick]').forEach(function (b) { b.classList.remove('active'); });
+                    paintReport();
+                });
+            });
+            setQuick('month');
+        })();
+
         /* one view at a time: the sidebar switches between Overview, Revenue,
            Reservations, Calendar and Courts instead of one very long page */
-        var VIEWS = ['overview', 'revenue', 'reservations', 'users', 'calendar', 'facilityControlSection'];
+        var VIEWS = ['overview', 'revenue', 'reservations', 'users', 'reports', 'calendar', 'facilityControlSection'];
         var mainEl = document.querySelector('.adm-main');
         var navLinks = document.querySelectorAll('.adm-nav a[data-nav]');
         window.admShowView = function (id, keepScroll) {
@@ -1498,6 +1674,7 @@
             navLinks.forEach(function (a) { a.classList.toggle('active', a.getAttribute('data-nav') === id); });
             try { history.replaceState(null, '', '#' + id); } catch (err) { /* ignore */ }
             if (id === 'users' && window.admLoadUsers) window.admLoadUsers();
+            if (id === 'reports' && window.admOpenReports) window.admOpenReports();
             if (!keepScroll) window.scrollTo(0, 0);
         };
         navLinks.forEach(function (a) {

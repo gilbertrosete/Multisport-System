@@ -69,7 +69,7 @@ const MESSAGES = {
     received: (b) => ({
         subject: 'We received your reservation ' + b.reference_no,
         headline: 'Reservation received',
-        lines: ['Thank you for booking with MultiSport. Your payment is being checked by the management.',
+        lines: ['Thank you for booking with Moldex Realty. Your payment is being checked by the management.',
                 'You will get another email once your reservation is approved.']
     }),
     approved: (b) => ({
@@ -144,7 +144,7 @@ function render(kind, b, x) {
     const html =
         '<div style="background:#eef2ee;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">' +
         '<div style="max-width:520px;margin:0 auto;background:#ffffff;border:2px solid #0a3624;">' +
-        '<div style="background:#0a3624;color:#fbbf24;padding:16px 22px;font-size:20px;font-weight:700;letter-spacing:1px;">MULTISPORT</div>' +
+        '<div style="background:#0a3624;color:#fbbf24;padding:16px 22px;font-size:20px;font-weight:700;letter-spacing:1px;">MOLDEX REALTY</div>' +
         '<div style="padding:22px;">' +
         '<h2 style="margin:0 0 12px;color:#0a3624;font-size:22px;">' + esc(m.headline) + '</h2>' +
         '<p style="margin:0 0 12px;color:#334155;font-size:15px;line-height:1.5;">Hi ' + esc(name) + ',</p>' +
@@ -171,7 +171,7 @@ function notify(kind, booking, extra) {
     try {
         const mail = render(kind, booking, extra);
         transporter.sendMail({
-            from: '"' + (config.fromName || 'MultiSport') + '" <' + config.user + '>',
+            from: '"' + (config.fromName || 'Moldex Realty') + '" <' + config.user + '>',
             to,
             subject: mail.subject,
             text: mail.text,
@@ -194,7 +194,7 @@ function sendResetCode(to, name, code) {
     const html =
         '<div style="background:#eef2ee;padding:24px 12px;font-family:Arial,Helvetica,sans-serif;">' +
         '<div style="max-width:520px;margin:0 auto;background:#ffffff;border:2px solid #0a3624;">' +
-        '<div style="background:#0a3624;color:#fbbf24;padding:16px 22px;font-size:20px;font-weight:700;letter-spacing:1px;">MULTISPORT</div>' +
+        '<div style="background:#0a3624;color:#fbbf24;padding:16px 22px;font-size:20px;font-weight:700;letter-spacing:1px;">MOLDEX REALTY</div>' +
         '<div style="padding:22px;">' +
         '<h2 style="margin:0 0 12px;color:#0a3624;font-size:22px;">Reset your password</h2>' +
         '<p style="margin:0 0 12px;color:#334155;font-size:15px;line-height:1.5;">Hi ' + esc(first) + ', use this code to set a new password:</p>' +
@@ -202,9 +202,9 @@ function sendResetCode(to, name, code) {
         '<p style="margin:0;color:#64748b;font-size:13px;line-height:1.5;">The code works for 10 minutes. If you did not ask for this, you can ignore this email and your password stays the same.</p>' +
         '</div></div></div>';
     transporter.sendMail({
-        from: '"' + (config.fromName || 'MultiSport') + '" <' + config.user + '>',
+        from: '"' + (config.fromName || 'Moldex Realty') + '" <' + config.user + '>',
         to,
-        subject: 'Your MultiSport password reset code',
+        subject: 'Your Moldex Realty password reset code',
         text: 'Hi ' + first + ',\n\nYour password reset code is ' + code + '. It works for 10 minutes.\nIf you did not ask for this, ignore this email.',
         html
     }, (err) => {
