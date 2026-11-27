@@ -3,7 +3,7 @@
    FULL SYSTEM ENGINE (SOFT DELETE & FLEXIBLE LIVE CALENDAR ENGINE)
 ========================================================= */
 
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "/api";
 
 // Strict Input Validation Helper Functions
 window.validateNameInput = function(nameStr) {

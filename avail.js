@@ -12,7 +12,7 @@
     var panel = document.getElementById('availPanel');
     if (!panel) return;
 
-    var API = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
+    var API = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
 
     var COURTS = [
         { key: 'basketball', name: 'Basketball', short: 'Basketball Court' },

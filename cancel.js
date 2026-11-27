@@ -11,7 +11,7 @@
 (function () {
     'use strict';
 
-    var API = 'http://localhost:5000/api';
+    var API = '/api';
 
     function todayIso() {
         var d = new Date();

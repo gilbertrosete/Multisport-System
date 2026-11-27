@@ -8,7 +8,7 @@
     var select = document.getElementById('homeSportSelect');
     if (!nameEl || !timeEl || !select) return;
 
-    var API = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
+    var API = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
     var NAMES = { basketball: 'Basketball Court', volleyball: 'Volleyball Court', tennis: 'Tennis Court', badminton: 'Badminton Court' };
     var ORDER = ['basketball', 'volleyball', 'tennis', 'badminton'];
     var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

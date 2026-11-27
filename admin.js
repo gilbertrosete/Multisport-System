@@ -24,7 +24,7 @@
 (function () {
     'use strict';
 
-    var API = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:5000/api';
+    var API = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
 
     /* ---------- admin sign-in guard ----------
        The real protection is on the server (it refuses admin requests without a
