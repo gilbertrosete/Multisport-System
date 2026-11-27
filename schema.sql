@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users (
     address     VARCHAR(255) NULL,
     role        VARCHAR(20)  NOT NULL DEFAULT 'customer',   -- 'customer' or 'admin'
     disabled    TINYINT(1)   NOT NULL DEFAULT 0,                        -- 1 = admin switched the account off (cannot log in)
+    privacy_consent_at DATETIME NULL,                           -- when the customer agreed to the Privacy Policy (RA 10173)
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_users_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     reschedule_date  DATE         NULL,
     reschedule_time  VARCHAR(20)  NULL,
     reschedule_count INT          NOT NULL DEFAULT 0,
+    privacy_consent_at DATETIME   NULL,                      -- when the customer agreed to the Privacy Policy (RA 10173)
     created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_bookings_reference (reference_no),
     KEY idx_bookings_email (email),

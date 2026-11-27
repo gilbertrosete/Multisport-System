@@ -1046,6 +1046,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 };
             }
 
+            // the customer's agreement to the Privacy Policy (RA 10173); the server refuses a booking without it
+            bookingPayload.privacy_consent = !!(window.MultiSportLegal && window.MultiSportLegal.agreed());
+
             try {
                 const response = await fetch(`${API_BASE}/bookings`, {
                     method: 'POST',
@@ -1290,7 +1293,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const response = await fetch(`${API_BASE}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password, firstName, lastName, phone, address })
+                    body: JSON.stringify({ email, password, firstName, lastName, phone, address, privacy_consent: !!(window.MultiSportLegal && window.MultiSportLegal.agreed()) })
                 });
 
                 const data = await response.json();

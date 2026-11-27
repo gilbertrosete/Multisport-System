@@ -30,15 +30,15 @@ function clearAttempts(email) {
     Object.keys(loginAttempts).forEach(k => { if (k.split('|')[0] === email) delete loginAttempts[k]; });
 }
 
-// MySQL Connection Setup (XAMPP) - dateStrings: true prevents timezone shifts (-1 day bug)
-// A connection POOL is used instead of one single connection: if XAMPP/MySQL drops an idle connection
-// (or restarts), the pool simply opens a new one, so the server no longer stops with
-// "Cannot enqueue Query after fatal error". db.query(...) works exactly the same as before.
+// MySQL Connection Setup (Aiven / Cloud + Local XAMPP fallback)
+// dateStrings: true prevents timezone shifts (-1 day bug)
 const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'multisport_db',
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'multisport_db',
+    ssl: (process.env.DB_HOST && process.env.DB_HOST !== 'localhost') ? { rejectUnauthorized: false } : false,
     dateStrings: true,
     waitForConnections: true,
     connectionLimit: 10,
@@ -52,7 +52,7 @@ db.getConnection((err, connection) => {
         console.error('MySQL Connection Error:', err);
     } else {
         connection.release();
-        console.log('Connected to MySQL Database (multisport_db)!');
+        console.log('Connected to MySQL Database!');
         setupFacilityStatus();
         setupRescheduleColumns();
         setupUserColumns();
@@ -213,7 +213,25 @@ function setupRescheduleColumns() {
 
 // users.disabled: 1 = the admin switched this customer's account off (login is refused).
 // Added by the server itself if missing, so the existing database and its data stay untouched.
+// RA 10173: the time the customer agreed to the Privacy Policy is kept with the account and with each booking
+function addConsentColumn(table) {
+    db.query("SHOW COLUMNS FROM " + table + " LIKE 'privacy_consent_at'", (err, rows) => {
+        if (err) return console.error('Consent column check error:', err);
+        if (rows.length) return;
+        db.query('ALTER TABLE ' + table + ' ADD COLUMN privacy_consent_at DATETIME NULL', (err2) => {
+            if (err2) console.error('Could not add column ' + table + '.privacy_consent_at:', err2);
+            else { consentCols[table] = true; console.log('Added ' + table + '.privacy_consent_at'); }
+        });
+    });
+}
+const consentGiven = (body) => !!body && (body.privacy_consent === true || body.privacy_consent === 'true');
+const CONSENT_MSG = 'Please read and agree to the Privacy Policy first. Refresh the page (Ctrl+F5) and try again.';
+let consentCols = { users: false, bookings: false };
+
 function setupUserColumns() {
+    addConsentColumn('users');
+    addConsentColumn('bookings');
+    ['users', 'bookings'].forEach(t => db.query("SHOW COLUMNS FROM " + t + " LIKE 'privacy_consent_at'", (e, r) => { if (!e && r && r.length) consentCols[t] = true; }));
     db.query("SHOW COLUMNS FROM users LIKE 'disabled'", (err, rows) => {
         if (err) return console.error('Users column check error:', err);
         if (rows.length) return;
@@ -229,10 +247,7 @@ function setupUserColumns() {
 // The picture is checked (real JPG/PNG/WebP, not too big) and saved in the uploads folder
 // with a random file name. Only the admin can open it again (GET /api/bookings/:id/payment-proof).
 // ---------------------------------------------------------------
-// Saved OUTSIDE the project folder on purpose: VS Code Live Server reloads the page whenever a file
-// inside the project changes, which would close the "Thank you" window right after booking.
-// Default: a folder called MultiSport-Uploads in your user folder. Set MULTISPORT_UPLOADS to use another place.
-const UPLOAD_DIR = process.env.MULTISPORT_UPLOADS || path.join(os.homedir(), 'MultiSport-Uploads');
+const UPLOAD_DIR = process.env.MULTISPORT_UPLOADS || (process.env.RENDER ? '/tmp/MultiSport-Uploads' : path.join(os.homedir(), 'MultiSport-Uploads'));
 const PROOF_MAX_BYTES = 4 * 1024 * 1024;
 
 function readProof(dataUrl) {
@@ -418,32 +433,31 @@ function findScheduleProblem(facility, dateStr, timeSlot, durationHours, done, e
     checkOverlap();
 
     function checkOverlap() {
+        const query = `
+            SELECT time_slot, duration_hours FROM bookings
+            WHERE LOWER(facility) LIKE LOWER(?)
+            AND booking_date = ?
+            AND (is_deleted = 0 OR is_deleted IS NULL)
+            AND COALESCE(booking_status, 'Pending') NOT IN ('Rejected', 'Cancelled', 'Refunded')
+            AND (? IS NULL OR id <> ?)
+        `;
 
-    const query = `
-        SELECT time_slot, duration_hours FROM bookings
-        WHERE LOWER(facility) LIKE LOWER(?)
-        AND booking_date = ?
-        AND (is_deleted = 0 OR is_deleted IS NULL)
-        AND COALESCE(booking_status, 'Pending') NOT IN ('Rejected', 'Cancelled', 'Refunded')
-        AND (? IS NULL OR id <> ?)
-    `;
+        const skipId = excludeId ? Number(excludeId) : null;
+        db.query(query, [`%${facility}%`, dateStr, skipId, skipId], (err, rows) => {
+            if (err) return done(err);
 
-    const skipId = excludeId ? Number(excludeId) : null;
-    db.query(query, [`%${facility}%`, dateStr, skipId, skipId], (err, rows) => {
-        if (err) return done(err);
+            const clash = rows.some(r => {
+                const s = hourOf(r.time_slot);
+                if (s === null) return false;
+                const e = s + Math.max(1, parseInt(r.duration_hours, 10) || 1);
+                return s < end && e > start;
+            });
 
-        const clash = rows.some(r => {
-            const s = hourOf(r.time_slot);
-            if (s === null) return false;
-            const e = s + Math.max(1, parseInt(r.duration_hours, 10) || 1);
-            return s < end && e > start;
+            if (clash) {
+                return done(null, `⚠️ Slot Unavailable!\n\nThis schedule (${timeSlot}, ${durationHours} hour${durationHours > 1 ? 's' : ''}) for ${facility} on ${dateStr} overlaps an existing reservation.`);
+            }
+            done(null, null);
         });
-
-        if (clash) {
-            return done(null, `⚠️ Slot Unavailable!\n\nThis schedule (${timeSlot}, ${durationHours} hour${durationHours > 1 ? 's' : ''}) for ${facility} on ${dateStr} overlaps an existing reservation.`);
-        }
-        done(null, null);
-    });
     }
 }
 
@@ -451,9 +465,6 @@ function findScheduleProblem(facility, dateStr, timeSlot, durationHours, done, e
 // PUBLIC AVAILABILITY CALENDAR (home page)
 // Only says which start times are free. No names, emails or amounts leave the server.
 //   GET /api/availability?month=2026-11
-// A start time is free when its hour is not covered by a live booking
-// (start + duration), the date is not in the past, and the court is not
-// under maintenance / occupied.
 // ---------------------------------------------------------------
 const START_HOURS = [8, 10, 12, 14, 16, 18, 20];
 const HOUR_LABEL = h => ((h % 12) || 12) + ':00 ' + (h < 12 ? 'AM' : 'PM');
@@ -512,7 +523,6 @@ app.get('/api/availability', (req, res) => {
                     days[date] = day;
                 }
                 res.setHeader('Cache-Control', 'no-store');
-                // start times of today that already went by (so the page can tell "time passed" apart from "booked")
                 const passed = START_HOURS.filter(h => h <= now.getHours()).map(HOUR_LABEL);
                 res.json({ success: true, month: monthStr, today: todayStr, starts: START_HOURS.map(HOUR_LABEL), passed, courts, days });
             }
@@ -538,27 +548,27 @@ app.post('/api/bookings/check-availability', (req, res) => {
 
 // CREATE NEW BOOKING (WITH DETAILED LOGGING)
 app.post('/api/bookings', limitBooking, (req, res) => {
-    const { 
-        reference_no, 
-        payment_ref, 
-        fullname, 
-        email, 
-        phone, 
-        address, 
-        purpose, 
-        organization, 
-        facility, 
-        booking_date, 
-        time_slot, 
+    const {
+        reference_no,
+        payment_ref,
+        fullname,
+        email,
+        phone,
+        address,
+        purpose,
+        organization,
+        facility,
+        booking_date,
+        time_slot,
         amount,
         payment_proof
     } = req.body;
-    
+
     const cleanDateStr = String(booking_date || '').trim().split('T')[0];
     const duration = cleanDuration(req.body.duration_hours);
 
-    // ---- the server checks everything again (the web page can be bypassed) ----
     const bad = (message) => res.status(400).json({ success: false, message });
+    if (!consentGiven(req.body)) return bad(CONSENT_MSG);
     const nameClean = String(fullname || '').trim().replace(/\s+/g, ' ');
     const emailClean = String(email || '').trim();
     const phoneClean = String(phone || '').trim();
@@ -581,7 +591,6 @@ app.post('/api/bookings', limitBooking, (req, res) => {
     if (cleanDateStr > lastDay.getFullYear() + '-' + pad2(lastDay.getMonth() + 1) + '-' + pad2(lastDay.getDate())) return bad('Reservations open up to one year ahead.');
     if (!String(reference_no || '').trim()) return bad('Missing reference number.');
 
-    // the price is set here, not by the browser: hourly rate x hours
     const amountServer = RATES[courtKey] * duration;
 
     const insertQuery = `
@@ -589,66 +598,62 @@ app.post('/api/bookings', limitBooking, (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 0)
     `;
 
-    // the payment screenshot is required and must be a real picture
     const proof = readProof(payment_proof);
     if (!proof) {
         return res.status(400).json({ success: false, message: 'Please upload a clear screenshot of your payment (JPG, PNG or WebP).' });
     }
 
-    // checked again here so the slot cannot be taken twice (two people paying at the same moment, or a direct API call)
-    // The check and the save run inside a lock for this court + date, so two requests cannot both pass the check.
-    // a customer whose account the admin disabled cannot book at all, not even as a guest with the same e-mail.
-    // If this check itself fails (for example the column is not there yet) booking simply carries on as before.
     const proceed = () => {
-    withLock(courtKey + '|' + cleanDateStr, (release) => {
-    findScheduleProblem(facility, cleanDateStr, time_slot, duration, (checkErr, problem) => {
-        if (checkErr) {
-            release();
-            console.error('Booking Availability Error:', checkErr);
-            return res.status(500).json({ success: false, message: 'Database error checking availability.' });
-        }
-        if (problem) { release(); return res.status(409).json({ success: false, message: problem }); }
+        withLock(courtKey + '|' + cleanDateStr, (release) => {
+            findScheduleProblem(facility, cleanDateStr, time_slot, duration, (checkErr, problem) => {
+                if (checkErr) {
+                    release();
+                    console.error('Booking Availability Error:', checkErr);
+                    return res.status(500).json({ success: false, message: 'Database error checking availability.' });
+                }
+                if (problem) { release(); return res.status(409).json({ success: false, message: problem }); }
 
-        let proofFile;
-        try {
-            proofFile = saveProof(proof, reference_no);
-        } catch (saveErr) {
-            release();
-            console.error('Save Screenshot Error:', saveErr);
-            return res.status(500).json({ success: false, message: 'Could not save the payment screenshot. Please try again.' });
-        }
+                let proofFile;
+                try {
+                    proofFile = saveProof(proof, reference_no);
+                } catch (saveErr) {
+                    release();
+                    console.error('Save Screenshot Error:', saveErr);
+                    return res.status(500).json({ success: false, message: 'Could not save the payment screenshot. Please try again.' });
+                }
 
-        db.query(insertQuery, [
-            String(reference_no).trim().slice(0, 100),
-            String(payment_ref || 'N/A').trim().slice(0, 100),
-            nameClean,
-            emailClean,
-            phoneClean,
-            String(address || 'N/A').trim().slice(0, 255),
-            String(purpose || 'N/A').trim().slice(0, 100),
-            String(organization || 'N/A').trim().slice(0, 100),
-            facility,
-            cleanDateStr,
-            String(time_slot).trim(),
-            duration,
-            amountServer,
-            proofFile
-        ], (err, result) => {
-            release();
-            if (err) {
-                fs.unlink(path.join(UPLOAD_DIR, proofFile), () => {});
-                console.error('❌ Insert Booking Error Details:', err);
-                return res.status(500).json({ success: false, message: 'Failed to create booking: ' + err.sqlMessage });
-            }
-            console.log(`✅ [SUCCESS] New Booking Inserted into MySQL! ID: ${result.insertId} | Ref: ${reference_no} | ${time_slot} x ${duration}h`);
-            mailer.notify('received', {
-                reference_no, fullname, email, facility, booking_date: cleanDateStr,
-                time_slot, duration_hours: duration, amount: amountServer
+                db.query(insertQuery, [
+                    String(reference_no).trim().slice(0, 100),
+                    String(payment_ref || 'N/A').trim().slice(0, 100),
+                    nameClean,
+                    emailClean,
+                    phoneClean,
+                    String(address || 'N/A').trim().slice(0, 255),
+                    String(purpose || 'N/A').trim().slice(0, 100),
+                    String(organization || 'N/A').trim().slice(0, 100),
+                    facility,
+                    cleanDateStr,
+                    String(time_slot).trim(),
+                    duration,
+                    amountServer,
+                    proofFile
+                ], (err, result) => {
+                    release();
+                    if (err) {
+                        fs.unlink(path.join(UPLOAD_DIR, proofFile), () => {});
+                        console.error('❌ Insert Booking Error Details:', err);
+                        return res.status(500).json({ success: false, message: 'Failed to create booking: ' + err.sqlMessage });
+                    }
+                    console.log(`✅ [SUCCESS] New Booking Inserted into MySQL! ID: ${result.insertId} | Ref: ${reference_no} | ${time_slot} x ${duration}h`);
+                    mailer.notify('received', {
+                        reference_no, fullname, email, facility, booking_date: cleanDateStr,
+                        time_slot, duration_hours: duration, amount: amountServer
+                    });
+                    if (consentCols.bookings) db.query('UPDATE bookings SET privacy_consent_at = NOW() WHERE id = ?', [result.insertId], () => {});
+                    res.json({ success: true, id: result.insertId, reference_no });
+                });
             });
-            res.json({ success: true, id: result.insertId, reference_no });
         });
-    });
-    });
     };
 
     db.query("SELECT 1 FROM users WHERE LOWER(email) = LOWER(?) AND disabled = 1 AND (role IS NULL OR role <> 'admin') LIMIT 1", [emailClean], (blockErr, blocked) => {
@@ -661,8 +666,6 @@ app.post('/api/bookings', limitBooking, (req, res) => {
 });
 
 // UPDATE BOOKING STATUS (Approve / Reject / Cancel / Refund) - admin only
-// Rules: only known statuses; the booking must exist; a booking that was Rejected / Cancelled / Refunded
-// can only be brought back (Pending / Approved / Cancel Requested) if its slot is still free.
 app.put('/api/bookings/:id', requireAdmin, (req, res) => {
     const bookingId = Number(req.params.id);
     const booking_status = String((req.body || {}).booking_status || '').trim();
@@ -671,7 +674,6 @@ app.put('/api/bookings/:id', requireAdmin, (req, res) => {
         return res.status(400).json({ success: false, message: 'Unknown status.' });
     }
 
-    // read the booking first, so the email can say what actually changed
     db.query("SELECT * FROM bookings WHERE id = ? AND (is_deleted = 0 OR is_deleted IS NULL) LIMIT 1", [bookingId], (findErr, found) => {
         if (findErr) {
             console.error('Update Status Lookup Error:', findErr);
@@ -698,11 +700,9 @@ app.put('/api/bookings/:id', requireAdmin, (req, res) => {
                     console.error('Update Status Error:', err);
                     return res.status(500).json({ success: false, message: 'Failed to update status.' });
                 }
-                // a waiting reschedule request makes no sense once the booking is no longer Approved
                 if (booking_status !== 'Approved') {
                     db.query("UPDATE bookings SET reschedule_date = NULL, reschedule_time = NULL WHERE id = ?", [bookingId], () => {});
                 }
-                // an admin cancelling is marked as such (the customer cancelling is set by the cancel request)
                 if (booking_status === 'Cancelled' && previous !== 'Cancel Requested') {
                     db.query("UPDATE bookings SET cancelled_by = 'admin' WHERE id = ?", [bookingId], () => {});
                 }
@@ -722,19 +722,19 @@ app.put('/api/bookings/:id', requireAdmin, (req, res) => {
 
         const reviveDate = String(before.booking_date).split('T')[0];
         withLock((courtKeyOf(before.facility) || 'other') + '|' + reviveDate, (release) => {
-        findScheduleProblem(before.facility, reviveDate, before.time_slot,
-            Math.max(1, parseInt(before.duration_hours, 10) || 1), (checkErr, problem) => {
-                if (checkErr) {
-                    release();
-                    console.error('Update Status Availability Error:', checkErr);
-                    return res.status(500).json({ success: false, message: 'Database error checking availability.' });
-                }
-                if (problem) {
-                    release();
-                    return res.status(409).json({ success: false, message: 'Cannot bring this booking back: its schedule is no longer free.\n' + problem.replace(/^⚠️\s*/, '') });
-                }
-                apply(release);
-            }, before.id);
+            findScheduleProblem(before.facility, reviveDate, before.time_slot,
+                Math.max(1, parseInt(before.duration_hours, 10) || 1), (checkErr, problem) => {
+                    if (checkErr) {
+                        release();
+                        console.error('Update Status Availability Error:', checkErr);
+                        return res.status(500).json({ success: false, message: 'Database error checking availability.' });
+                    }
+                    if (problem) {
+                        release();
+                        return res.status(409).json({ success: false, message: 'Cannot bring this booking back: its schedule is no longer free.\n' + problem.replace(/^⚠️\s*/, '') });
+                    }
+                    apply(release);
+                }, before.id);
         });
     });
 });
@@ -792,9 +792,6 @@ app.post('/api/bookings/cancel-request', limitRequests, (req, res) => {
 });
 
 // CUSTOMER RESCHEDULE REQUEST
-// Rules: Approved booking, play date after today, one reschedule per booking, no other
-// request waiting, same court and same duration (so the price stays the same),
-// new date after today, and the new schedule must be free.
 const MAX_RESCHEDULES = 1;
 
 function todayText() {
@@ -908,30 +905,29 @@ app.post('/api/bookings/:id/reschedule-decision', requireAdmin, (req, res) => {
 
         const newDate = String(b.reschedule_date).split('T')[0];
         const duration = Math.max(1, parseInt(b.duration_hours, 10) || 1);
-        // the new slot may have been taken since the request was sent, so check again
         withLock((courtKeyOf(b.facility) || 'other') + '|' + newDate, (release) => {
-        findScheduleProblem(b.facility, newDate, b.reschedule_time, duration, (checkErr, problem) => {
-            if (checkErr) {
-                release();
-                console.error('Reschedule Decision Availability Error:', checkErr);
-                return res.status(500).json({ success: false, message: 'Database error checking availability.' });
-            }
-            if (problem) { release(); return res.status(409).json({ success: false, message: problem }); }
-
-            db.query(
-                "UPDATE bookings SET booking_date = ?, time_slot = ?, reschedule_count = COALESCE(reschedule_count, 0) + 1, reschedule_date = NULL, reschedule_time = NULL WHERE id = ?",
-                [newDate, b.reschedule_time, id],
-                (err3) => {
+            findScheduleProblem(b.facility, newDate, b.reschedule_time, duration, (checkErr, problem) => {
+                if (checkErr) {
                     release();
-                    if (err3) {
-                        console.error('Reschedule Apply Error:', err3);
-                        return res.status(500).json({ success: false, message: 'Could not move the booking.' });
-                    }
-                    mailer.notify('resched_approved', b, { date: newDate, time: b.reschedule_time });
-                    res.json({ success: true, decision, booking_date: newDate, time_slot: b.reschedule_time });
+                    console.error('Reschedule Decision Availability Error:', checkErr);
+                    return res.status(500).json({ success: false, message: 'Database error checking availability.' });
                 }
-            );
-        }, id);
+                if (problem) { release(); return res.status(409).json({ success: false, message: problem }); }
+
+                db.query(
+                    "UPDATE bookings SET booking_date = ?, time_slot = ?, reschedule_count = COALESCE(reschedule_count, 0) + 1, reschedule_date = NULL, reschedule_time = NULL WHERE id = ?",
+                    [newDate, b.reschedule_time, id],
+                    (err3) => {
+                        release();
+                        if (err3) {
+                            console.error('Reschedule Apply Error:', err3);
+                            return res.status(500).json({ success: false, message: 'Could not move the booking.' });
+                        }
+                        mailer.notify('resched_approved', b, { date: newDate, time: b.reschedule_time });
+                        res.json({ success: true, decision, booking_date: newDate, time_slot: b.reschedule_time });
+                    }
+                );
+            }, id);
         });
     });
 });
@@ -954,7 +950,8 @@ app.delete('/api/bookings/:id', requireAdmin, (req, res) => {
 app.post('/api/register', limitAccount, async (req, res) => {
     const { email, password, firstName, lastName, phone, address } = req.body || {};
 
-    // checked here too, not only on the page
+    if (!consentGiven(req.body)) return res.json({ success: false, message: CONSENT_MSG });
+
     const emailClean = String(email || '').trim();
     const nameOk = v => !String(v || '').trim() || /^[A-Za-z\u00C0-\u024F][A-Za-z\u00C0-\u024F .'\-]{0,98}$/.test(String(v).trim());
     if (!EMAIL_OK.test(emailClean) || emailClean.length > 255) return res.json({ success: false, message: 'Please enter a valid email address.' });
@@ -993,6 +990,7 @@ app.post('/api/register', limitAccount, async (req, res) => {
                     console.error('Registration Insert Error:', err2);
                     return res.status(500).json({ success: false, message: 'Failed to register: ' + err2.sqlMessage });
                 }
+                if (consentCols.users) db.query('UPDATE users SET privacy_consent_at = NOW() WHERE id = ?', [result.insertId], () => {});
                 res.json({ success: true, message: 'Account created successfully in MySQL!' });
             });
         });
@@ -1003,8 +1001,6 @@ app.post('/api/register', limitAccount, async (req, res) => {
 });
 
 // REAL USER & ADMIN LOGIN (BCRYPT + LOCK AFTER 3 WRONG PASSWORDS)
-// The lock is per email AND per device, and it ends by itself after 5 minutes, so nobody can keep
-// another person (or the admin) locked out just by typing wrong passwords.
 app.post('/api/login', limitAccount, (req, res) => {
     const email = String((req.body || {}).email || '').trim();
     const password = String((req.body || {}).password || '');
@@ -1048,7 +1044,6 @@ app.post('/api/login', limitAccount, (req, res) => {
         try { match = await bcrypt.compare(password, user.password); } catch (e) { match = false; }
         if (!match) return failed();
 
-        // correct password, but the admin switched this customer's account off
         if (Number(user.disabled) === 1 && user.role !== 'admin') {
             return res.json({ success: false, message: 'This account has been disabled. Please contact Moldex Realty for help.' });
         }
@@ -1074,10 +1069,8 @@ app.post('/api/login', limitAccount, (req, res) => {
 
 // ---------------------------------------------------------------
 // FORGOT PASSWORD (6-digit code sent by email, kept in memory for 10 minutes)
-// The answer never says whether an email is registered. Admin accounts are
-// skipped on purpose: an admin password is changed in the database.
 // ---------------------------------------------------------------
-const resetCodes = new Map();           // email -> { code, expires, tries, last }
+const resetCodes = new Map();
 const RESET_MINUTES = 10, RESET_MAX_TRIES = 5, RESET_COOLDOWN_MS = 60 * 1000;
 
 app.post('/api/forgot-password/request', limitReset, (req, res) => {
@@ -1100,7 +1093,6 @@ app.post('/api/forgot-password/request', limitReset, (req, res) => {
         const code = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
         resetCodes.set(email, { code, expires: Date.now() + RESET_MINUTES * 60 * 1000, tries: 0, last: Date.now() });
         const sent = mailer.sendResetCode(rows[0].email, rows[0].firstName, code);
-        // With email OFF (or a placeholder address) show the code in this terminal so a demo still works.
         if (!sent) console.log('[Forgot password] Email is not available. Code for ' + email + ': ' + code);
         res.json(generic);
     });
@@ -1136,7 +1128,7 @@ app.post('/api/forgot-password/reset', limitReset, (req, res) => {
             }
             if (!result.affectedRows) return res.json(bad);
             resetCodes.delete(email);
-            clearAttempts(email);   // also lifts the "3 wrong attempts" lock for this email
+            clearAttempts(email);
             res.json({ success: true, message: 'Password changed. You can log in now.' });
         });
     }).catch((e) => {
@@ -1145,12 +1137,7 @@ app.post('/api/forgot-password/reset', limitReset, (req, res) => {
     });
 });
 
-// COUNT REGISTERED USERS (for the admin dashboard)
-// ==========================================
 // UPDATE OWN ACCOUNT DETAILS (Settings)
-// The email is the account identity: it is never changed here.
-// The current password is required, because the site has no login session.
-// ==========================================
 app.put('/api/users/update', async (req, res) => {
     const { email, password, firstName, lastName, phone, address } = req.body || {};
 
@@ -1210,12 +1197,7 @@ app.get('/api/users/count', requireAdmin, (req, res) => {
     });
 });
 
-// ---------------------------------------------------------------
 // ADMIN: USERS TAB
-// List of customer accounts (never the password) with how many bookings each one made,
-// and a switch to disable / enable an account. Admin accounts are never listed or changed here.
-// Bookings are matched by e-mail (guest bookings with the same e-mail are counted too).
-// ---------------------------------------------------------------
 app.get('/api/admin/users', requireAdmin, (req, res) => {
     const sql = `
         SELECT u.id, u.email, u.firstName, u.lastName, u.phone, u.created_at,
@@ -1261,14 +1243,15 @@ app.put('/api/admin/users/:id/disabled', requireAdmin, (req, res) => {
         const email = String(rows[0].email || '').trim().toLowerCase();
         db.query('UPDATE users SET disabled = ? WHERE id = ?', [disable ? 1 : 0, id], (err2) => {
             if (err2) { console.error('Disable user error:', err2); return res.status(500).json({ success: false, message: 'Database error' }); }
-            // a disabled customer who is logged in right now is signed out immediately
             if (disable) for (const [t, v] of userTokens) if (v.email === email) userTokens.delete(t);
             res.json({ success: true, disabled: disable });
         });
     });
 });
 
+app.use(express.static(__dirname));
+
 console.log('Payment screenshots are saved in: ' + UPLOAD_DIR);
 
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+const PORT = Number(process.env.PORT) || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

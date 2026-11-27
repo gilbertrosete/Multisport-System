@@ -19,48 +19,56 @@
     if (window.__msLegalLoaded) return;
     window.__msLegalLoaded = true;
 
-    var UPDATED = 'November 2026';
+    var UPDATED = 'November 27, 2026';
     var BRAND = 'Moldex Realty';                          /* the name shown at the top of the pop-up and in the text */
     var PLACE = 'MetroGate Silang Estates';
     var CONTACT = 'MoldexRealty@gmail.com';                /* contact address shown in the privacy text (same as the footer) */
     var STORE_KEY = 'msPrivacyAgreed';
     var VERSION = '1';
-    var GATED = ['continueBookingBtn', 'submitGuestBooking', 'submitRegisterBtn'];   /* buttons that wait for the agreement */
+    var GATED = ['continueBookingBtn', 'submitGuestBooking', 'submitRegisterBtn', 'confirmQrPaymentBtn'];   /* buttons that wait for the agreement */
 
     /* ------------------------------------------------------------------ the text */
     var PRIVACY = {
         title: 'Privacy Policy',
         sections: [
             ['1. Introduction', [
-                'This Privacy Policy explains how the reservation system for the sports facilities of ' + PLACE + ', operated by ' + BRAND + ', handles the personal information you give when you create an account or reserve a facility.',
-                'By continuing, you confirm that you have read this policy.'
+                'This Privacy Policy explains how the reservation system for the sports facilities of ' + PLACE + ', operated by ' + BRAND + ', collects, uses, stores and protects your personal information. We follow the Data Privacy Act of 2012 (Republic Act No. 10173) and its implementing rules.',
+                'By ticking "I agree" when you register or reserve a facility, you give your consent to the handling of your information as described here. If you do not agree, you may simply not continue; no information is saved until you submit your registration or reservation.'
             ]],
-            ['2. Information We Collect', [
-                'When you register or make a reservation, the system collects your name, email address, contact number and address, together with the details of your booking: the facility, date, time, purpose and organization.',
-                'It also keeps the payment reference and the payment screenshot you upload so the payment can be checked. If you create an account, your password is stored in a scrambled (hashed) form and not as readable text.'
+            ['2. Who Is Responsible', [
+                BRAND + ' is the personal information controller for the information collected through this system. Questions, requests and complaints about your information can be sent to ' + CONTACT + '.'
             ]],
-            ['3. How We Use Your Information', [
-                'Your information is used to process, confirm and manage your reservation, to check your payment, to send you email updates about the status of your booking, and to contact you if there is a problem with your schedule.',
-                'It is also used to keep reservation records for the facilities.'
+            ['3. Information We Collect', [
+                'Account registration: your name, email address, contact number, address and a password. The password is stored only in a scrambled (hashed) form, never as readable text.',
+                'Reservation: your name, email address, contact number and address, the facility, date, time and duration you chose, your purpose and organization, the payment reference number, and the payment screenshot you upload.',
+                'The payment screenshot may show payment details such as an account name or number. Please upload only what is needed to prove your payment.',
+                'We also keep the date and time of your consent and the status of your reservation (for example pending, approved, rejected, cancelled or refunded).'
             ]],
-            ['4. Information Security', [
-                'We take reasonable steps to protect the information stored in the system against unauthorized access, changes, disclosure or loss. Access to bookings is limited to authorized personnel. No online system can be made completely risk-free, so please also keep your own password private.'
+            ['4. Why We Collect It', [
+                'To process, confirm and manage your reservation; to check your payment and handle cancellations, rescheduling and refunds; to send you email updates about your booking; to contact you if there is a problem with your schedule; to prevent double booking; and to keep reservation and income records and reports for the facilities.',
+                'We use your information only for these purposes. We do not use it for advertising or marketing.'
             ]],
-            ['5. Information Sharing', [
-                'Your information is seen only by authorized personnel of MetroGate Silang Estates and Moldex Realty who manage the facilities and reservations. It is not sold. It may be disclosed when the law requires it.'
+            ['5. Who Can See It', [
+                'Your information is seen only by the authorized personnel of ' + BRAND + ' and ' + PLACE + ' who manage the facilities and reservations. It is not sold or rented. It is disclosed to others only if the law, a court or a government agency requires it.',
+                'Email updates are sent through an email service on our behalf and contain only the details of your own booking.'
             ]],
-            ['6. Data Retention', [
-                'Reservation and account information is kept for as long as it is needed to run the facilities, keep proper records and meet legal requirements.'
+            ['6. How Long We Keep It', [
+                'Reservation records and payment screenshots are kept for as long as needed for accounting, auditing and dispute handling, and as required by law. Account information is kept while your account is active. When information is no longer needed, it is deleted or made anonymous.'
             ]],
-            ['7. Your Rights', [
-                'Under the Data Privacy Act of 2012 (Republic Act No. 10173) you may ask to see the personal information we hold about you, ask for corrections, object to how it is used, withdraw your consent, or ask for it to be removed, subject to what the law and our records allow.',
-                'To make a request, write to ' + CONTACT + '.'
+            ['7. How We Protect It', [
+                'We use reasonable organizational and technical measures: hashed passwords, limited access to the admin dashboard, payment screenshots that only the administrator can open, and limits on repeated requests. No online system can be made completely risk-free, so please also keep your own password private.',
+                'If a breach affecting your information happens and the law requires it, we will notify you and the National Privacy Commission.'
             ]],
-            ['8. Cookies and Sessions', [
-                'The system uses your browser storage to keep you signed in, to remember the facility, date and time you chose, and to remember that you have read this policy. It is not used for advertising.'
+            ['8. Your Rights', [
+                'Under the Data Privacy Act you have the right to be informed, to access the information we hold about you, to correct it, to object to its use, to withdraw your consent, to ask for it to be blocked or deleted, to data portability, and to claim compensation for damages caused by misuse of your information. These rights are subject to the limits allowed by law and to our need to keep records.',
+                'To make a request, write to ' + CONTACT + ' and tell us the email address you used. We may ask you to confirm your identity first. Withdrawing consent or asking for deletion may mean we can no longer process a reservation for you.',
+                'If you believe your rights were violated, you may also file a complaint with the National Privacy Commission (privacy.gov.ph).'
             ]],
-            ['9. Changes to This Privacy Policy', [
-                'This policy may be updated when necessary. Changes will appear on this page with a new date.'
+            ['9. Cookies and Browser Storage', [
+                'The system uses your browser storage to keep you signed in, to remember the facility, date and time you chose, and to remember that you agreed to this policy during your visit. It is not used for advertising or tracking.'
+            ]],
+            ['10. Changes to This Privacy Policy', [
+                'This policy may be updated when necessary. The new date will appear at the top of this page, and you will be asked to agree again if the changes are important.'
             ]]
         ]
     };
@@ -84,8 +92,10 @@
             ['5. Payment', [
                 'A payment reference and a payment screenshot are required with each reservation. A reservation may be rejected if the payment cannot be verified.'
             ]],
-            ['6. Cancellation and Rescheduling', [
-                'If you cannot use your schedule, please request a cancellation or change as early as possible through the system or by contacting the management. Cancellations and any refund are subject to the approval of the management.'
+            ['6. Cancellation, Rescheduling and Refunds', [
+                'Cancellation: a reservation can be cancelled online up to the day before its date. On the day of the reservation, please contact the management.',
+                'Rescheduling: an approved reservation can be moved once to another open schedule before its date. The new schedule must be approved by the management.',
+                'Refunds: if a reservation is rejected, or a cancellation is accepted by the management, the payment is refunded in full to the account it was paid from, and you will be notified by email. No-shows and cancellations made after the reservation has started are not refunded unless the management decides otherwise.'
             ]],
             ['7. Use of the Facilities', [
                 'Please use the facilities with care, follow the rules of MetroGate Silang Estates, and finish on time for the next group. You are responsible for any damage you cause.'
@@ -260,10 +270,6 @@
         var a = e.target.closest ? e.target.closest('a') : null;
         if (!a) return;
         var kind = a.getAttribute('data-legal');
-        if (!kind && a.closest('.footer-legal')) {
-            var t = (a.textContent || '').toLowerCase();
-            kind = t.indexOf('privacy') > -1 ? 'privacy' : t.indexOf('terms') > -1 ? 'terms' : '';
-        }
         if (kind !== 'privacy' && kind !== 'terms') return;
         e.preventDefault();
         open(kind);
@@ -278,6 +284,20 @@
         e.stopImmediatePropagation();
         open('privacy', { agree: true, onAgree: function () { btn.click(); } });
     }, true);
+
+    /* privacy.html / terms.html: write the same text on the page itself (one source of text for pop-up and page) */
+    function renderPage() {
+        var box = document.getElementById('legalDoc');
+        if (!box) return;
+        var doc = box.getAttribute('data-kind') === 'terms' ? TERMS : PRIVACY;
+        box.innerHTML = '';
+        box.appendChild(el('p', 'legal-date', 'Last updated: ' + UPDATED));
+        doc.sections.forEach(function (sec) {
+            box.appendChild(el('h2', '', sec[0]));
+            sec[1].forEach(function (t) { box.appendChild(el('p', '', t)); });
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderPage); else renderPage();
 
     window.MultiSportLegal = { open: open, agreed: agreed, reset: forget };
 })();
