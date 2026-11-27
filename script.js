@@ -619,7 +619,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
     const selectedFacilityParam = urlParams.get('facility');
 
-    document.querySelectorAll("a[href='index.html'], a.logo, .brand-logo-img").forEach(homeLink => {
+    document.querySelectorAll("a[href='/'], a.logo, .brand-logo-img").forEach(homeLink => {
         homeLink.addEventListener("click", () => {
             window.clearBookingDraft();
         });
@@ -1335,7 +1335,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         localStorage.setItem("multisportLoggedInUser", JSON.stringify(data.user));
                         localStorage.setItem("multisportUserToken", data.userToken || "");
                         alert("Login successful!");
-                        window.location.href = "index.html"; // Na-update na para sa Home/Index page mapunta
+                        window.location.href = "/"; // Na-update na para sa Home/Index page mapunta
                     }
                 } else {
                     alert(data.message || "Invalid email or password.");

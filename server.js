@@ -1249,7 +1249,20 @@ app.put('/api/admin/users/:id/disabled', requireAdmin, (req, res) => {
     });
 });
 
-app.use(express.static(__dirname));
+// Clean URLs: redirect /index.html -> / and /page.html -> /page
+app.use((req, res, next) => {
+    if (req.method === 'GET') {
+        if (req.path === '/index.html') {
+            return res.redirect(301, '/');
+        }
+        if (req.path.endsWith('.html')) {
+            return res.redirect(301, req.path.slice(0, -5));
+        }
+    }
+    next();
+});
+
+app.use(express.static(__dirname, { extensions: ['html'] }));
 
 console.log('Payment screenshots are saved in: ' + UPLOAD_DIR);
 
